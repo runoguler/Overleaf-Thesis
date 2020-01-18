@@ -198,7 +198,7 @@ By utilizing this idea, we can reduce the search space for each user according t
 In figure \ref{fig:motivation}, an example of query images are coming from a user is shown with red crosses on the search space. 
 For this user, a new query vector just needs to be compared with centroids in blue areas. 
 We can reduce the amount of centroids to compare with a simple hyper-parameter, controlling whether to include a subspace according to minimum occurrence of the past query vectors. 
-To be continued...
+In this way, we can adjust the trade-off between accuracy and the speed of the system.
 
 
 \subsection{Extracting Deep Features of Images}
@@ -243,16 +243,32 @@ As can be seen in the figure, some subspaces have extreme bias towards a few cla
 There are many class categories in Places dataset that have similar images, such as "elevator-door", "elevator-interior", "elevator lobby", "elevator shaft", etc.
 For example, the subspace with id:17 in the figure has labels with very similar images.
 
-According to our scenario, users have wearable device with a camera, such as wearable glasses or a smart phone. 
+According to our scenario, users have wearable devices with a camera, such as wearable glasses or a smart phone. 
 When they first start using the image search system, the class recognition system will store the classification labels of the users. 
 After storing labels for enough time, we will consider those labels as the user's required class labels.
-Then we 
-
-
-
+Then, we select the subspaces, out of all 1350 subspaces, that contain any of those class labels at least $m$ times. 
+$m$ is the hyper-parameter to adjust the trade-off between accuracy and speed.
+Whenever a new query image comes from the user, we compare the query vector only with the centroids of the selected subspaces to reduce time.
+Note that, classification labels are merely a tool for us to categorize the requirements of the users.
+Most similar images do not necessarily have the same labels.
 
 
 \subsection{Implementation details}
 
+As mentioned before, we built our work on FAISS implementation\cite{faiss} of product quantization with inverted index, namely IndexIVFPQ. 
+The code is shared publicly and we modified the code to tailor to our needs.
+Extra function is added to adjust the search space according to a given list. 
+This function is called during the indexing phase of the database before the search.
+
+The training phase is required for IndexIVFPQ and it needs different vectors than the database vectors with similar distribution.
+Training dataset of Places365 contains 1.8 million images. 
+After obtaining the descriptor vectors of the images, we split the vectors into three parts.
+Base vectors containing roughly 1.3 million vectors to form the search space, about a half million training vectors to train IndexIVFPQ and remaining approximately 3000 for query vectors.
+The vectors are split into 3 parts in a way that the number of images for each label in all parts are almost equal.
+When querying for a user, only the images with the required labels out of 3000 are used for the query images when mimicking scenario users.
+
 \subsection{Baselines}
+
+Our main baseline is the FAISS implementation\cite{faiss} of product quantization with inverted index, namely IndexIVFPQ.
+We compared our method with IndexIVFPQ by evaluating for search time per query and recall at 1 where recall at $k$ checks if the true result is one of the $k$ predicted results.
 
