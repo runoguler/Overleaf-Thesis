@@ -113,7 +113,6 @@ for example a chef is surrounded by kitchen tools whereas a pilot encounters air
 When defining user types as Dirichlet distributions, we randomly put high values(200s) for high likely to encounter classes and low values(1s) for less likely to encounter classes. For example, a user type in 5-class classification would be $Dir(1,1,200,1,200)$. 
 A test user generated from this specific distribution will encounter images in 3rd and 5th class much more than the rest of them. 
 We chose the number of high values(200s) in a user type as 2 or 3 for testing CIFAR-10, which means each user is likely to encounter 2 or 3 classes out of 10 classes. 
-This number is varied from 2 to 20 instead of 2 to 3, when testing Places365 dataset.
 
 To generate a user, a user type is chosen uniformly randomly between $m$ user types. 
 Then, list of encountered class labels for the user are generated according to the chosen user type. 
@@ -164,19 +163,94 @@ However, exhaustive searching of the database is slow and complex, especially wi
 Thus, Approximate Nearest Neighbor (ANN) search algorithms are proposed with significantly faster search speed and a small probability of error. 
 We built our work on the FAISS implementation\cite{faiss} of Product Quantization\cite{jegou2010product} with inverted multi-index as well as using it as our baseline.
 
-\subsection{Extracting deep features of images}
+As explained previously in \ref{subsec:related-quantization}, product quantization method clusters the database space into $k$ clusters using k-means clustering algorithm. 
+Following the convention, we chose $k=\sqrt{N}$ where $N$ is the number of database vectors. 
+In this way, number of vectors corresponding to a centroid of a cluster will be $\sqrt{N}$ in average. 
+Once a query vector comes, the algorithm searches the closest centroid among $\sqrt{N}$ centroids. 
+Then, the query vector is compared with the database vectors that belong to the chosen centroid and a few neighboring ones. 
+In both steps, there are $O(\sqrt{N})$ comparisons to be done. 
+
+Our work aims to reduce the number of comparisons in the first step by limiting the area of the search space for each user according to their requirements. 
+The motivation is that most users have a certain query distribution, different than that of the database, 
+so they query some parts of the search space more and the other parts less likely. More will be explained in \ref{motivation}.
+
+In the following subsections, methods of our work will be explained in detail. 
+Firstly, the motivation of our idea will be discussed.
+Then, method of representing the images with vectors will be described. 
+Next, the details of the dataset we used and the importance of using classification label information for our work will be explained. 
+After specifying the implementation details, baselines of our work will be defined.
+
+\subsection{Motivation}
+\label{motivation}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{thesis/images/improvement-fig.png}
+    \caption{Query vectors and clustering of the search space is shown. Red crosses represent the position the query vectors fall in the space. We can choose to include every subspace with red crosses in our search as in the left figure. A hyper-parameter can control to include a subspace according to minimum occurrence of red crosses.}
+    \label{fig:motivation}
+\end{figure}
+
+ANN search algorithms commonly assume that the distribution of the query vectors is the same with the distribution of the database. 
+However, real users query the system with different distributions.
+This difference is sourcing from their limited surroundings in daily life or their different hobbies and interests. 
+By utilizing this idea, we can reduce the search space for each user according to their requirements.
+
+In figure \ref{fig:motivation}, an example of query images are coming from a user is shown with red crosses on the search space. 
+For this user, a new query vector just needs to be compared with centroids in blue areas. 
+We can reduce the amount of centroids to compare with a simple hyper-parameter, controlling whether to include a subspace according to minimum occurrence of the past query vectors. 
+To be continued...
+
+
+\subsection{Extracting Deep Features of Images}
 
 \begin{figure}
     \centering
     \includegraphics[width=0.9\textwidth]{thesis/images/deep_features-fig.png}
     \caption{Last fully connected layer of VGG16\cite{simonyan2014very} is discarded to obtain a descriptor vector with dimension 4096.}
-    \label{fig:baselines}
+    \label{fig:vec-repr}
 \end{figure}
 
-dont forget about PCA
+In the work of Babenko \emph{et al.}\cite{babenko2014neural}, using a pre-trained convolutional neural network in ImageNet for image retrieval task is shown to have decent results. 
+Note that, it is also shown that if the network is trained on the same data with the retrieval dataset, the results are better.
+However, instead of getting the best performance, we simply investigate the comparison of our idea with the current best methods.
+Therefore, we used VGG16\cite{simonyan2014very} network that is pre-trained on ImageNet\cite{deng2009imagenet}. 
+The last fully connected layer is discarded to get a vector representation with 4096 dimensions, as in figure \ref{fig:vec-repr}.
+Then, all database images are passed through the model once to get their descriptor vectors.
+
+However, dimensions of the vectors were quite big for both storage and calculation. 
+As stated in \cite{jegou2012negative}, applying whitening on the descriptor vectors not only helps with the computational and storage costs, but also improves the accuracy of retrieval tasks.
+We applied Principal Component Analysis (PCA) to obtain the final descriptor vectors with 64 dimensions.
 
 
-\subsection{Observing "subspaces" with label information (Also dataset info)}
+\subsection{Dataset and Using classification label information}
+
+In our experiments, we used the scene recognition dataset called Places365\cite{zhou2017places}. 
+Only the training images of Places365 is used to construct our retrieval database. 
+There are 1.8 million training images with 365 class categories. 
+The class categories include various scenes such as airport terminal, library, train station, waterfall, etc. 
+With such diverse scenes, users would interact with only a subset of the class categories and our idea can be easily applied to speed up the search according to each user's requirements.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{thesis/images/label_dist-fig.png}
+    \caption{Distribution of the images according to their class labels in the first 20 subspaces}
+    \label{fig:label-dist}
+\end{figure}
+
+The search space is divided into 1350 subspaces which is roughly the square root of the number of all images. 
+Distribution of the images according to their classification labels can be seen in the figure \ref{fig:label-dist}.
+As can be seen in the figure, some subspaces have extreme bias towards a few class, while others do not have much. 
+There are many class categories in Places dataset that have similar images, such as "elevator-door", "elevator-interior", "elevator lobby", "elevator shaft", etc.
+For example, the subspace with id:17 in the figure has labels with very similar images.
+
+According to our scenario, users have wearable device with a camera, such as wearable glasses or a smart phone. 
+When they first start using the image search system, the class recognition system will store the classification labels of the users. 
+After storing labels for enough time, we will consider those labels as the user's required class labels.
+Then we 
+
+
+
+
 
 \subsection{Implementation details}
 
