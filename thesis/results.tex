@@ -1,0 +1,67 @@
+
+\lhead[\chaptername~\thechapter]{\rightmark}
+
+\rhead[\leftmark]{}
+
+\lfoot[\thepage]{}
+
+\cfoot{}
+
+\rfoot[]{\thepage}
+
+\chapter{Experiments\label{experiments}}
+
+\section{Image Classification}
+
+\section{Image Retrieval}
+
+% \begin{description}
+% \item{\textbf{ObMiC}~\cite{fu2014object}.} This method is one of the most relevant method to our work as it used region proposals and considered temporal consistency for co-segmenting objects across multiple videos. We introduce this baseline to see how points-of-gaze information guides the segmentation of objects being looked at jointly since this baseline method is not utilizing the information from point-of-gaze data.
+
+% \item{\textbf{Baseline1}.} In order to see if points-of-gaze information alone works well for segmenting objects of joint attention, this simplified version of the proposed model employs the only $\Psi\sub{GO}$, the first term of Eq.~(\ref{equa_model_potential}), while abnegating temporal consistency between segments and the effect of joint attention.
+
+% \item{\textbf{Baseline2}.} In this baseline, we aim to see how the cue of temporal consistency helps stable segmentation under cluttered scenes and noisy points of gaze. Specifically, we use $\Psi\sub{GO}$ and $\Psi\sub{TS}$, which means that we optimize multiple linear-chain CRF sub-modules independently without considering the cues about joint attention.
+% \end{description}
+
+
+% \begin{table}
+% \begin{center}
+% \begin{tabular}{|l|c|c|c|c|c|}
+% \hline
+% Method &FtF-large&FtF-small&SbS-large&SbS-small&Avg.\\
+% \hline\hline
+% ObMiC \cite{fu2014object} & 0.287&0.212&0.065&0.336&0.225 \\
+% Baseline1 & 0.552&0.599&0.681&0.691&0.631 \\
+% Baseline2 & 0.611&0.629&0.723&0.726&0.672\\
+% \hline
+% Ours & \textbf{0.633}&\textbf{0.660}&\textbf{0.730}&\textbf{0.735}&\textbf{0.690}\\
+% \hline
+% \end{tabular}
+% \end{center}
+% \caption[Quantitative Comparisons on Segmentation Task of Two-person Cases]{\textbf{Quantitative Comparisons on Segmentation Task of Two-person Cases}: Intersection-over-union (IoU) ratio for four different recording conditions of two persons.}
+% \label{segtable}
+% \end{table}
+
+
+
+% \begin{table*}
+% \begin{center}
+% \scalebox{0.9}{
+%   \begin{tabular}{|l|cccccccc|c|}
+%   \hline
+%     \multirow{2}{*}{Method} &
+%       \multicolumn{2}{c}{FtF-large (\%)} &
+%       \multicolumn{2}{c}{FtF-small (\%)} &
+%       \multicolumn{2}{c}{SbS-large (\%)} &
+%       \multicolumn{2}{c|}{SbS-small (\%)} & {Avg. (\%)} \\
+%       & {P} & {R} & {P} & {R} & {P} & {R} & {P} & {R} & {F1 score}\\
+%       \hline
+%     Kera \etal & 74.5 & 89.7 & 69.7 & \textbf{93.8} & 72.9 & \textbf{96.5} & 67.1 & 83.4 & 79.0 \\
+%     Ours & \textbf{91.9} & \textbf{92.8} & \textbf{84.7} & 86.5 & \textbf{94.3} & 92.6 & \textbf{79.7} & \textbf{98.7} & \textbf{89.3} \\
+%     \hline
+%   \end{tabular}
+%     }
+%   \end{center}
+% \caption[Quantitative Comparisons on Temporal Localization Task.]{\textbf{Quantitative Comparisons on Temporal Localization Task}: Precision (P) and recall (R) scores for each condition as well as the F1 score averaged over all the conditions.}
+% \label{jatable}
+% \end{table*}

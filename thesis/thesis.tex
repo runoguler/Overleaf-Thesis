@@ -1,0 +1,245 @@
+%% LyX 2.2.1 created this file.  For more info, see http://www.lyx.org/.
+%% Do not edit unless you really know what you are doing.
+\documentclass[12pt,a4paper,english,intoc,bibliography=totoc,index=totoc,BCOR10mm,captions=tableheading,titlepage,fleqn]{scrbook}
+\usepackage{lmodern}
+\renewcommand{\sfdefault}{lmss}
+\renewcommand{\ttdefault}{lmtt}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\setcounter{secnumdepth}{3}
+\setlength{\parskip}{\medskipamount}
+\setlength{\parindent}{0pt}
+\usepackage{babel}
+\usepackage{verbatim}
+\usepackage{mathtools}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{multirow}
+\usepackage{bm}
+\usepackage{xcolor}
+\usepackage{algpseudocode}
+\usepackage{subcaption}
+\usepackage[ruled,vlined,noresetcount]{algorithm2e}
+
+\SetKwRepeat{Do}{do}{while}
+\algnewcommand\algorithmicforeach{\textbf{for each}}
+\algdef{S}[FOR]{ForEach}[1]{\algorithmicforeach\ #1\ \algorithmicdo}
+
+\usepackage{CJKutf8}
+\newcommand*{\Ja}[1]{%
+  \begin{CJK}{UTF8}{ipxg}#1\end{CJK}}
+
+\def\bv #1{\boldsymbol{\mathrm{#1}}}%%%%vector
+\def\bm #1{\boldsymbol{#1}}%%%%%matrix
+\def\vct#1{\mbox{\boldmath $#1$}}
+\def\sub#1{_{\rm #1}}
+\newcommand{\argmax}{\mathop{\rm arg~max}\limits}
+\newcommand{\argmin}{\mathop{\rm arg~min}\limits}
+\newcommand{\newmin}{\mathop{\rm min}\limits}
+\newcommand{\newmax}{\mathop{\rm max}\limits}
+
+\newcommand{\onedot}{.\null}
+\newcommand{\etal}{\emph{et al}\onedot}
+\def\eg{\emph{e.g}\onedot}
+\def\ie{\emph{i.e}\onedot}
+\def\Eg{\emph{E.g}\onedot}
+\def\etal{\emph{et al}\onedot}
+\newcommand{\cai}[1]{\textcolor{purple}{[Cai: #1]}}
+\DeclareOldFontCommand{\it}{\normalfont\itshape}{\mathit}
+\DeclareOldFontCommand{\rm}{\normalfont\rmfamily}{\mathrm}
+
+\PassOptionsToPackage{normalem}{ulem}
+\usepackage{ulem}
+\usepackage{nomencl}
+% the following is useful when we have the old nomencl.sty package
+\providecommand{\printnomenclature}{\printglossary}
+\providecommand{\makenomenclature}{\makeglossary}
+\makenomenclature
+\usepackage[unicode=true,pdfusetitle,
+ bookmarks=true,bookmarksnumbered=true,bookmarksopen=true,bookmarksopenlevel=1,
+ breaklinks=false,pdfborder={0 0 0},pdfborderstyle={},backref=false,colorlinks=false]
+ {hyperref}
+\hypersetup{
+ pdfpagelayout=OneColumn, pdfnewwindow=true, pdfstartview=XYZ, plainpages=false}
+
+\makeatletter
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LyX specific LaTeX commands.
+\pdfpageheight\paperheight
+\pdfpagewidth\paperwidth
+
+\newcommand{\noun}[1]{\textsc{#1}}
+%% Because html converters don't know tabularnewline
+\providecommand{\tabularnewline}{\\}
+
+\@ifundefined{date}{}{\date{}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% User specified LaTeX commands.
+% in case somebody want to have the label "Equation"
+%\renewcommand{\eqref}[1]{Equation~(\negthinspace\autoref{#1})}
+
+% that links to image floats jumps to the beginning
+% of the float and not to its caption
+\usepackage[figure]{hypcap}
+
+% the pages of the TOC is numbered roman
+% and a pdf-bookmark for the TOC is added
+\let\myTOC\tableofcontents
+\renewcommand\tableofcontents{%
+  \frontmatter
+  \pdfbookmark[1]{\contentsname}{}
+  \myTOC
+  \mainmatter }
+
+% makes caption labels bold
+% for more info about these settings, see
+% http://mirrors.ctan.org/macros/latex/contrib/koma-script/doc/scrguien.pdf
+\setkomafont{captionlabel}{\bfseries}
+\setcapindent{1em}
+
+% enables calculations
+\usepackage{calc}
+
+% fancy page header/footer settings
+% for more information see section 9 of
+% http://www.ctan.org/tex-archive/macros/latex/contrib/fancyhdr/fancyhdr.pdf
+\renewcommand{\chaptermark}[1]{\markboth{#1}{#1}}
+\renewcommand{\sectionmark}[1]{\markright{\thesection\ #1}}
+
+% increases the bottom float placement fraction
+\renewcommand{\bottomfraction}{0.5}
+
+% avoids that floats are placed above its sections
+\let\mySection\section\renewcommand{\section}{\suppressfloats[t]\mySection}
+
+% increases link area for cross-references and autoname them
+% if you change the document language to e.g. French
+% you must change "extrasenglish" to "extrasfrench"
+% if you uncomment the following lines, you cannot use the reference version Ref+Text in LyX
+%\AtBeginDocument{%
+% \renewcommand{\ref}[1]{\autoref{#1}}
+%}
+%\def\refnamechanges{%
+% \renewcommand*{\equationautorefname}[1]{}
+% \renewcommand{\sectionautorefname}{sec.\negthinspace}
+% \renewcommand{\subsectionautorefname}{sec.\negthinspace}
+% \renewcommand{\subsubsectionautorefname}{sec.\negthinspace}
+% \renewcommand{\figureautorefname}{Fig.\negthinspace}
+% \renewcommand{\tableautorefname}{Tab.\negthinspace}
+%}
+%\@ifpackageloaded{babel}{\addto\extrasenglish{\refnamechanges}}{\refnamechanges}
+
+\def\eg{{\it e.g.}}
+\def\ie{{\it i.e.}}
+\def\etal{{\it et al.}}
+
+\makeatother
+
+\begin{document}
+
+
+\subject{Master's Thesis}
+\title{Preference-based Personal Adaptation of Image Classification and Image Retrieval Tasks\vspace{3cm}}
+
+\author{Onur Guler\\
+Advisor: Professor Yoichi Sato\\
+Submission Date: Jan 31st, 2020\vspace{1.5cm}}
+
+\publishers{\includegraphics[scale=0.15]{images/ut-logo}\\
+Department of Information and Communication Engineering Graduate School of Information Science and Technology\\
+The University of Tokyo\medskip{}
+}
+
+\lowertitleback{\textbf{Advisor}\smallskip{}
+\\
+Prof. Yoichi Sato}
+
+\maketitle
+\lhead{\rightmark}
+
+\rhead[\leftmark]{}
+
+\lfoot[\thepage]{}
+
+\cfoot{}
+
+\rfoot[]{\thepage}
+
+\pagestyle{plain}
+\pagenumbering{roman}
+\addchap*{Abstract}
+
+Image classification and image retrieval tasks commonly use generic solutions that work for hundreds of class categories. However, an average user often requires only a few class categories whether it is for classifying an image or retrieving the most similar images. For example, a chef may require to distinguish between kitchen equipment whereas a researcher would need class categories such as a computer and lab equipment. Daily routines of the users and their limited surroundings are a huge constraint on their usage. By taking into account the user's requirements, it is possible to obtain a personalized, faster and more memory efficient solution.
+
+For the image classification task, we proposed a novel scheme that users can adaptively and memory-efficiently run a part of a convolutional neural network(CNN) according to their needs without any user-side retraining. Our proposed hierarchical CNN structure can be loaded partially into the user's device to reduce the memory consumption of the system. Our experiments show that the hierarchical CNN is significantly reducing the memory usage per user while maintaining the classification accuracy of the system.
+
+By adopting our idea on image retrieval task, Approximate Nearest Neighbor(ANN) search can be improved by reducing the search space according to the user requirements. Most ANN algorithms assume that the query vectors follow a similar distribution with the searched database. However, users have different interests and environments that strongly affects their usage of the image retrieval system as we have mentioned before. Our experiments show that knowing the required class labels of a user allows us to reduce the area of the search space and improve the search time while maintaining the recall.
+
+
+\newpage
+
+
+\tableofcontents
+
+\pagenumbering{arabic}
+\listoffigures
+\addcontentsline{toc}{chapter}{List of Figures}
+
+\listoftables
+\addcontentsline{toc}{chapter}{List of Tables}
+
+\cleardoublepage{}
+
+\pagestyle{plain}
+
+\cleardoublepage{}
+
+\pagestyle{fancy}
+
+\lhead[\chaptername~\thechapter]{\rightmark}
+
+\pagestyle{plain}
+\include{intro}
+
+\include{related}
+
+\include{method}
+
+\include{results}
+
+\include{discussion}
+
+\include{conclusion}
+
+\cleardoublepage{}
+
+\lhead[]{Acknowledgments}
+
+\rhead[Acknowledgments]{}
+
+\include{Acknowledgments}
+
+
+\appendix
+\include{Appendix}
+
+\cleardoublepage{}
+
+\lhead[]{\rightmark}
+
+\rhead[\leftmark]{}
+
+\renewcommand{\bibname}{References}
+\bibliographystyle{alpha}
+\bibliography{egbib}
+
+\cleardoublepage{}
+
+\lhead[]{Nomenclature}
+
+\rhead[Nomenclature]{}
+
+\printnomenclature[2.5cm]{}
+\end{document}
