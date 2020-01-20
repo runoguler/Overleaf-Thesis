@@ -265,7 +265,7 @@ Training dataset of Places365 contains 1.8 million images.
 After obtaining the descriptor vectors of the images, we split the vectors into three parts.
 Base vectors containing roughly 1.3 million vectors to form the search space, about a half million training vectors to train IndexIVFPQ and remaining approximately 3000 for query vectors.
 The vectors are split into 3 parts in a way that the number of images for each label in all parts are almost equal.
-When querying for a user, only the images with the required labels out of 3000 are used for the query images when mimicking scenario users.
+When querying for a user, only the images with the required labels out of 3000 are used for the query images.
 
 \subsection{Baselines}
 

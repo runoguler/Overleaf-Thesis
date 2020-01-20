@@ -28,7 +28,7 @@ Because of this, we will also address some hierarchical systems that are similar
 \subsection*{Efficient CNNs}
 
 Deep neural network compression techniques reduce the size of the neural networks for a considerable amount. 
-There has been much research about how to efficiently compress neural networks, examples of such methods include pruning, parameter sharing(quantization), knowledge distillation etc. 
+There has been much research about how to efficiently compress neural networks, examples of such methods include pruning\cite{anwar2017structured}, quantization\cite{han2016eie}, knowledge distillation\cite{hinton2015distilling} etc. 
 Generally, compression methods prioritize either memory, computation or energy cost while obtaining more efficient CNN models.
 
 \begin{figure}
@@ -54,6 +54,8 @@ but also they reduce the size of the model in general, not with respect to each 
 Moreover, our method is to allow users to adaptively use part of the functionality of a model instead of a compression technique.
 Having said that, our method can be used jointly with the mentioned works for further reducing the size of the models according to user requirements.
 
+\subsection*{Dynamic Approaches}
+
 More dynamic approaches include pruning convolutional channels at runtime depending on the input image supported by a RNN network to decide which channels to be omitted~\cite{Lin2017RuntimeNP}. 
 As in the figure \ref{fig:runtimenp}, some feature maps are being omitted according to the input image and previously omitted feature maps supervised by RNN.
 This method preserves the full ability of the network and improves the speed of the network while maintaining the accuracy. 
@@ -69,6 +71,18 @@ Despite serving each user personalized compression, this method is not for adapt
 The resulting model has all the classification functionality that the user does not need for their usage purposes. 
 Even though this method satisfies each user's system requirements, it is not removing the undesired functionality of the system to reduce the network size.
 
+A method for on-device customization of CNNs\cite{guo2017pruning2} aims to prune the unneeded classes with their corresponding filters according to user needs. 
+For each class labels, they calculate the impact of each filters on the class labels. 
+Not only do they compute impact of each filter on each class, they also compute the compensation needed by the linear combination of other filters.
+In their scenario, the system distributes the model to each user with an automatic pruning algorithm tailored to each user's need. 
+Then, the users can prune the filters in the model for a specific subset of classes and apply the compensation algorithm to maintain the accuracy after pruning. 
+As all of the calculation is done beforehand, the user just needs to run the program without the need for re-training or fine-tuning.
+A later work of the same group\cite{guo2017pruning} changes the compensation method.
+The new compensation parameters are either the mean feature map or the feature map of the most correlated filter.
+The experiments are only done in CIFAR-10 dataset. The classification accuracy is compared between 10-class model a few-class models, so it is hard to analyze the accuracy drop.
+Moreover, according to their scenario, the whole model is loaded to user's device which might be a memory issue.
+Also, there is still compensation algorithm required to be run on user-side, whereas in our method users do not need to change the model once the model is loaded.
+
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth]{thesis/images/runtimenp-fig.png}
@@ -78,14 +92,28 @@ Even though this method satisfies each user's system requirements, it is not rem
 
 \subsection*{Hierarchical Solutions}
 
-There is plenty of work adopting hierarchically structured CNNs. Roy et al.~\cite{roy2018tree} uses a Tree-CNN to propose a solution for incremental learning. 
+There is plenty of work adopting hierarchically structured CNNs. 
+While some of them employ the hierarchy to achieve higher accuracy, the others aim to obtain efficient models.
+Roy et al.~\cite{roy2018tree} uses a Tree-CNN to propose a solution for incremental learning. 
 In their architecture, the branches of the network grows as new classes added to the model without having an effect on the already learned classes. 
-This hierarchical model is similar to our proposed model in this paper, regardless of the problem that it solves. 
+This hierarchical model is quite similar to our proposed model in this paper, regardless of the problem that it solves. 
 HD-CNN~\cite{Yan_2015_ICCV} approaches image classification with the idea that some classes are easy to classify and they only need coarse networks while others require deeper and more complicated networks. 
-They make use of a hierarchical classifier to classify easy and hard images on different levels to improve the accuracy. 
+They make use of a hierarchical classifier to classify easy and hard images on different levels to improve better accuracy. 
+
+Below methods use hierarchical decomposition to convert large networks into small few-class networks.
+In \cite{chennupati2016hierarchical} and \cite{nooka2016adaptive}, the aim is to divide the functionality of a large deep network into multiple smaller networks. 
+They use an interesting way of clustering the labels according to the similarities between them, using confusion matrix for the classification of these labels.
+Then, multiple smaller parallel-working networks are obtained. 
+Their results are combined to have the overall result for the classification of all labels.
+With this method, individual models can be used for classifying a subset of classes.
+However, the class labels in sub-models are fixed as the decomposition of the large model is based on the similarity of the labels instead of the actual user requirements.
+HSD-CNN\cite{sairam2018hsd} successfully converts many-class CNN to hierarchical by branching the network to two after some initial layers.
+While branching, the class set is divided to two subsets according to their similarity.
+The layers are split according to their impact on the score for both subsets.
+The resulting network needs fine-tuning step for a few epochs at the end. 
+Moreover, the class separation is done according to the similarities of the labels instead of considering the user requirements.
 Even though, there are various usage of hierarchical CNNs, we believe it is a novel approach to exploit them for allowing users to adaptively use sub-parts of the model according to their individual requirements.
 
-There was one more really similar one I think........
 
 \section{Image Retrieval}
 
