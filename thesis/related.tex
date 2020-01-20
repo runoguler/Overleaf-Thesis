@@ -19,33 +19,62 @@ Since our idea of using diverse user requirements to personalize the systems for
 \section{Image Classification}
 
 Our proposed method is to obtain a CNN model that can be used partially by each user according to their requirements to be able to distribute efficient models to each user.
+As our proposed method aims for efficiency, efficient CNNs will be the main topic in this section.
 In the following subsections, efficient CNN models such as various compression methods will be mentioned.
 More emphasis will be done to dynamic compression methods.
-As our solution is using a hierarchical approach, we will also address some hierarchical systems.
+Moreover, our proposed method is using a hierarchical approach to solve the problem. 
+Because of this, we will also address some hierarchical systems that are similar to our proposed model.
 
 \subsection*{Efficient CNNs}
 
 Deep neural network compression techniques reduce the size of the neural networks for a considerable amount. 
 There has been much research about how to efficiently compress neural networks, examples of such methods include pruning, parameter sharing(quantization), knowledge distillation etc. 
-Pruning CNN models involves eliminating the connections~\cite{molchanov2016pruning} \cite{Yu_2018_CVPR}\cite{Wang2018StructuredPP} or entire channels \cite{He_2017_ICCV}\cite{li2016pruning} that are identified as having a small importance on the output result. 
-In \cite{han2015deep}, Han et al. succeeded to reduce the size of VGG-16 by 49x with a 3-step method. 
-Firstly, by eliminating the model connections whose weights are below a threshold(pruning), 
-then grouping the remaining weights into shared weights to reduce the bits to represent the all the weights(quantization) and 
-lastly using Huffman coding to further reduce the bit representation of all the weights. 
-Another way to reduce the model size is to use knowledge distillation~\cite{hinton2015distilling}. 
-The idea is to use the output of a large model or an ensemble of specialist models to train a compact network while retaining the accuracy.
+Generally, compression methods prioritize either memory, computation or energy cost while obtaining more efficient CNN models.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{thesis/images/deep_comp-fig.png}
+    \caption{Three steps of Deep Compression by Han et al.\cite{han2015deep}}
+    \label{fig:deepcomp}
+\end{figure}
+
+Pruning CNN models involves eliminating some individual connections~\cite{molchanov2016pruning} \cite{Yu_2018_CVPR}\cite{Wang2018StructuredPP} or discarding entire channels \cite{He_2017_ICCV}\cite{li2016pruning} that are identified as having a small importance on the output result.
+In a famous work about pruning\cite{han2015deep}, Han \emph{et al.} succeeded to reduce the size of VGG-16 by 49x with a 3-step method, as in figure \ref{fig:deepcomp}. 
+First step is to prune or eliminate the model connections whose weights are below a threshold. 
+In this step, the remaining connections are need to be re-trained for a couple of epochs to maintain the accuracy.
+The next step is quantization by grouping the remaining weights into shared weights to reduce the bits to represent the all of the weights.
+Last step is using Huffman coding to further reduce the bit representation of all the weights. 
+Another way of reducing the model size is knowledge distillation. 
+One highly influential example is the work by Hinton \emph{et al.}, where the main idea is to use the output of a large model or an ensemble of specialist models to train a compact network while retaining the accuracy.
+Instead of training from the data with definite one-hot coded labels, a larger model is imitated by training a smaller one with the probabilistic outputs of the large model.
+In this way, a larger model is condensed into a smaller version.
 
 Not only all the above-mentioned methods require a costly re-training phase to maintain the accuracy,
 but also they reduce the size of the model in general, not with respect to each user's requirements of using the model. 
 Moreover, our method is to allow users to adaptively use part of the functionality of a model instead of a compression technique.
-Having said that, our method can be used jointly with the mentioned works for further reducing the size of the models.
+Having said that, our method can be used jointly with the mentioned works for further reducing the size of the models according to user requirements.
 
-More dynamic approaches include pruning convolutional channels at runtime depending on the image input supported by a RNN network to decide which channels to be omitted~\cite{Lin2017RuntimeNP}. 
+More dynamic approaches include pruning convolutional channels at runtime depending on the input image supported by a RNN network to decide which channels to be omitted~\cite{Lin2017RuntimeNP}. 
+As in the figure \ref{fig:runtimenp}, some feature maps are being omitted according to the input image and previously omitted feature maps supervised by RNN.
 This method preserves the full ability of the network and improves the speed of the network while maintaining the accuracy. 
-Though the network runs adaptively according to the input images, it does not serve our purpose of providing users with smaller models custom-made for their requirements. 
-Another method, namely AdaDeep, automatically select a combination of compression techniques especially for deploying neural networks on resource-constrained mobile platforms~\cite{Liu2018OnDemandDM}. 
-It chooses the best combination of compression algorithms according to user-specified performance goals and resource constraints. 
+The network runs adaptively according to the input images and
+can be even fine-tuned for user-requirements to satisfy each user separately.
+However, the model is not getting smaller in storage size. 
+As one of our concern is the restricted storage memory of wearable devices, it does not serve our purpose of providing users with smaller models custom-made for their requirements. 
+
+Another method, namely AdaDeep~\cite{Liu2018OnDemandDM}, automatically selects a combination of compression techniques especially for deploying neural networks on resource-constrained mobile platforms. 
+AdaDeep aims to compress CNN models according to user specifications such as memory limitation, desired accuracy, etc. 
+It chooses the best combination of compression algorithms among many different algorithms that prioritize different aspects according to user-specified performance goals and resource constraints. 
 Despite serving each user personalized compression, this method is not for adaptively using a sub-functionality of the model.
+The resulting model has all the classification functionality that the user does not need for their usage purposes. 
+Even though this method satisfies each user's system requirements, it is not removing the undesired functionality of the system to reduce the network size.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{thesis/images/runtimenp-fig.png}
+    \caption{Overall framework of Runtime Neural Pruning\cite{Lin2017RuntimeNP}}
+    \label{fig:runtimenp}
+\end{figure}
 
 \subsection*{Hierarchical Solutions}
 
@@ -55,6 +84,8 @@ This hierarchical model is similar to our proposed model in this paper, regardle
 HD-CNN~\cite{Yan_2015_ICCV} approaches image classification with the idea that some classes are easy to classify and they only need coarse networks while others require deeper and more complicated networks. 
 They make use of a hierarchical classifier to classify easy and hard images on different levels to improve the accuracy. 
 Even though, there are various usage of hierarchical CNNs, we believe it is a novel approach to exploit them for allowing users to adaptively use sub-parts of the model according to their individual requirements.
+
+There was one more really similar one I think........
 
 \section{Image Retrieval}
 
