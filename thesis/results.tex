@@ -13,6 +13,92 @@
 
 \section{Image Classification}
 
+\subsection{Dataset}
+We evaluated our method on CIFAR-10~\cite{krizhevsky2009learning} dataset. 
+CIFAR-10 is a relatively small dataset with 10 classes, consisting of 50000 training and 10000 test images with size 32 x 32 x 3.
+The reason to choose CIFAR-10 is to try as many possibilities of constructing the hierarchy to find the best structure for the trade-off between accuracy and memory consumption.
+Possible ways of constructing the Hierarchical CNN such as different depths, branching positions, etc., is tested on CIFAR-10 to find the ones with the best results with respect to both accuracy and memory cost. 
+Then, in the future experiments, the best resulting models can also evaluated on bigger and more complex datasets.
+
+\subsection{Backbone Networks}
+As mentioned earlier in section \ref{ssec:baselines}, the hierarchical CNN and multiple CNNs are based on a backbone CNN, which means that they follow the convolutional layer order of another network.
+In our work, VGG16~\cite{simonyan2014very} and MobileNet~\cite{howard2017mobilenets} are used as backbone networks.
+Every branch starting from the root until the leaves follow the layer order of the backbone network. 
+When the hierarchical CNN is split into two branches, although each branch still follows the layer order of the backbone network, the number of convolutional filters are reduced by a factor.
+The reason is to maintain the overall size of the hierarchical CNN, therefore the storage consumption of the backbone network and the whole hierarchical CNN is the same which makes the comparison more fair.
+Please note that, for CIFAR-10 experiments, we reduced the fully connected layer of VGG16 to prevent over-fitting, as VGG16 is designed to be used on larger domain classification problems.
+
+\subsection{Implementation Details}
+
+\subsubsection*{Training Phase}
+Training users are generated as explained in \ref{ssec:genusers}. 
+By examining the training users, the similarity between the classes can be calculated and the hierarchical clustering of class labels can be obtained, as in \ref{ssec:hierarchy}. 
+Then, we construct the hierarchical CNN from the hierarchy.
+
+When training the hierarchical CNN, every branch that leads up to a leaf node is trained with all the training images. 
+Let's assume a simple example with two branches, meaning the backbone network is divided into two branches only once.
+In this case, each image in the training dataset passes through the initial layers, then continues to pass the first branch and also the second branch subsequently.
+Every leaf node consists of a subset of class labels and an extra label called 'else'. 
+If a leaf node does not contain the class label of the training image, the branch is trained as though the label of the image is that special label 'else'. 
+In our example, first the loss is calculated for the first branch and the initial layers and then the loss for the second branch and the initial layers is calculated. 
+Note that, for the initial layers, loss from the first branch result and the second branch result is added to get the final loss. 
+Loss calculation for more than 2 branches can be generalized in the same way.
+
+To sum up, for each batch of training data, all branches starting from the root node and ending at a leaf node were trained together. Because some parameters between branches are shared, the shared parameters are updated according to the result of multiple leaf nodes.
+
+\subsubsection*{Testing Phase}
+In our experiments, two types of tests are conducted. 
+First one is straightforward as we test the whole network of hierarchical CNN or multiple CNNs with the test set of CIFAR-10. 
+The second type is the scenario-based testing, which imitates test users by using subsets of the test data.
+
+As we emphasized throughout the paper, we assume that users encounter only a subset of all classes due to the limitation of their surroundings.
+Therefore, we generated test users that are biased to encounter a subset of classes. 
+The process of generating users and user types is explained in detail in section \ref{ssec:genusers}. 
+
+For experiments on CIFAR-10, 10 user types are randomly generated and each user type is biased towards 2 or 3 random classes out of 10.
+Then we generated test users that randomly belong to one of the user types. 
+Each test user encounters a series of images that are biased to belong to some subset of all classes. 
+Experiments are done with 100 generated test users for testing on CIFAR-10 where each test user encounters 1000 random images that are biased according to their user types.
+
+In our scenario-based approach, users initially download the whole hierarchical model and use the whole model for the first $k$ classification task. 
+This is the initial warm-up stage to learn the user's requirements.
+Then, they only keep the part of the model including the formerly classified class labels and delete the rest of the model according to learned user requirements.
+We will refer to the remaining part of the model as the personalized model.
+In the future, if users encounter a class that is not part of the personalized model, the model detects that the newly encountered class belongs to another branch with the help of the 'else' classification label on every leaf in our tree-structured CNN (Figure \ref{fig:hierarchy}). 
+As a result, they download additional parts of the model until the newly encountered class is recognized. 
+
+The storage consumption per user is calculated as follows. 
+Let us assume that a test user encounters 1000 images and personalized model was sufficient to recognize the class of the images $p$ times. 
+The whole model is initially used $k$ times to learn the user requirements. 
+$k$ is set to be 10 for our experiments.
+The size of the whole model, personalized model and average size of the extra used model parts are $S_w$,$S_p$ and $S_{ex}$ respectively.
+Then the calculation is done as the following.
+\begin{equation*}
+    S_{total} = [k(S_w) + p(S_p) + (1000-k-p)(S_p+S_{ex})] / 1000
+\end{equation*}
+Finally, we take an average of $S_{total}$ over all the test users to obtain our final result for the storage consumption in our scenario.
+
+
+\subsection{Experiments}
+As mentioned before, experiments are done on CIFAR-10. VGG16 based model results can be seen in the figure \ref{fig:vggcifar} where as results for MobileNet based models is in the figure \ref{fig:mobilecifar}. 
+
+The first three columns are the hyper-parameters. 
+In this specific experiment, hierarchical CNN with depths 1, 2, 3 has 2, 3 and 5 leaf nodes respectively due to the obtained hierarchy, 
+hence they correspond to multiple CNN with number of models 2, 3 and 5. 
+Each corresponding model pairs have the same class labels on their leaf nodes.
+Incidentally, note that depth is limited to 3 in CIFAR-10 experiments due to the number of classes.
+
+Branching positions are generally chosen to be the convolutional layer positions that the number of kernels increase with respect to the previous layer in the backbone network. 
+The reason is intuitive because otherwise the number of kernels would be less than the previous layer's as we reduce the number of kernels when branching. 
+Having said that, it is possible to choose all positions.
+
+In both figure \ref{fig:vggcifar} and \ref{fig:mobilecifar}, best model overall is hierarchical CNN architecture with depth 3. 
+Even though the number of parameters for multiple CNN with 5 models is the least, the accuracy drop is an issue because the number of parameters for first layers are less than that of hierarchical CNN.
+
+Experiments on Places365 dataset is done for MobileNet based models. In figure \ref{fig:mobileplaces}, accuracy drop can be observed more clearly. Hierarchical CNN seems to be a good trade-off between accuracy and memory consumption per user.
+
+
+
 \section{Image Retrieval}
 
 % \begin{description}
@@ -23,45 +109,99 @@
 % \item{\textbf{Baseline2}.} In this baseline, we aim to see how the cue of temporal consistency helps stable segmentation under cluttered scenes and noisy points of gaze. Specifically, we use $\Psi\sub{GO}$ and $\Psi\sub{TS}$, which means that we optimize multiple linear-chain CRF sub-modules independently without considering the cues about joint attention.
 % \end{description}
 
+\begin{table}[]
+\begin{center}
+\begin{tabular}{c||c|c|c||c|c|c}
+\begin{tabular}[c]{@{}c@{}}Type of\\ Network\end{tabular} &
+\begin{tabular}[c]{@{}c@{}}Number of \\ Parallel \\ Models\end{tabular} & 
+Depth & 
+\begin{tabular}[c]{@{}c@{}}Branching\\ Positions\end{tabular} & 
+\begin{tabular}[c]{@{}c@{}}Test\\ Accuracy\end{tabular} & 
+\begin{tabular}[c]{@{}c@{}}Scenario\\ Accuracy\end{tabular} & 
+\begin{tabular}[c]{@{}c@{}}Number of\\ Params\\ (millions)\end{tabular}  \\
+\hline\hline
+VGG16& - & - & - & 89.33 & 88.38 & 15.25  \\ 
+\hline
+\hline
+\multirow{3}{*}{\begin{tabular}[c]{@{}c@{}}Multiple\\ Smaller\\ CNNs\end{tabular}} 
+& 2 & - & - & 88.54 & 88.57 & 9.9 \\ 
+\cline{2-7} 
+& 3 & - & - & 90.68 & 90.74 & 9.97 \\ 
+\cline{2-7} 
+& 5 & - & - & 89.89 & 89.78 & \textbf{7.89} \\ 
+\hline
+\hline
+\multirow{10}{*}{\begin{tabular}[c]{@{}c@{}}Hierarchical\\ CNNs\end{tabular}} 
+& - & 1 & 3 & 89.59 & 90.01 & 10.17 \\ 
+\cline{2-7} 
+& - & 1 & 6 & 91.08 & 90.89 & 10.33 \\ 
+\cline{2-7} 
+& - & 1 & 9 & 90.91 & 90.25 & 11.1 \\ 
+\cline{2-7} 
+& - & 2 & 3,6 & 90.69 & 90.64 & 9.52 \\ 
+\cline{2-7} 
+& - & 2 & 6,9 & 90.88 & 91 & 9.82 \\ 
+\cline{2-7} 
+& - & 2 & 3,9 & 90.58 & 90.64 & 9.72 \\ 
+\cline{2-7} 
+& - & 2 & 6,12 & 91 & 90.92 & 10.28 \\ 
+\cline{2-7} 
+& - & 2 & 9,12 & 90.79 & 90.41 & 11 \\ 
+\cline{2-7} 
+& - & 3 & 3,6,9 & \textbf{91.7} & \textbf{91.71} & \textbf{8.27} \\ 
+\cline{2-7} 
+& - & 3 & 6,9,12 & \textbf{91.75} & 91.54 & 9.11                                                                   
+\end{tabular}
+\end{center}
+\caption[Comparison of Accuracy and Memory Cost on Image Classification task with VGG16]{\textbf{Comparison of Accuracy and Memory Cost on Image Classification task with VGG16}: Two methods are compared with the backbone network on the test accuracy, scenario accuracy and number of parameters.}
+\label{ic-vgg16cifar10}
+\end{table}
 
-% \begin{table}
-% \begin{center}
-% \begin{tabular}{|l|c|c|c|c|c|}
-% \hline
-% Method &FtF-large&FtF-small&SbS-large&SbS-small&Avg.\\
-% \hline\hline
-% ObMiC \cite{fu2014object} & 0.287&0.212&0.065&0.336&0.225 \\
-% Baseline1 & 0.552&0.599&0.681&0.691&0.631 \\
-% Baseline2 & 0.611&0.629&0.723&0.726&0.672\\
-% \hline
-% Ours & \textbf{0.633}&\textbf{0.660}&\textbf{0.730}&\textbf{0.735}&\textbf{0.690}\\
-% \hline
-% \end{tabular}
-% \end{center}
-% \caption[Quantitative Comparisons on Segmentation Task of Two-person Cases]{\textbf{Quantitative Comparisons on Segmentation Task of Two-person Cases}: Intersection-over-union (IoU) ratio for four different recording conditions of two persons.}
-% \label{segtable}
-% \end{table}
 
-
-
-% \begin{table*}
-% \begin{center}
-% \scalebox{0.9}{
-%   \begin{tabular}{|l|cccccccc|c|}
-%   \hline
-%     \multirow{2}{*}{Method} &
-%       \multicolumn{2}{c}{FtF-large (\%)} &
-%       \multicolumn{2}{c}{FtF-small (\%)} &
-%       \multicolumn{2}{c}{SbS-large (\%)} &
-%       \multicolumn{2}{c|}{SbS-small (\%)} & {Avg. (\%)} \\
-%       & {P} & {R} & {P} & {R} & {P} & {R} & {P} & {R} & {F1 score}\\
-%       \hline
-%     Kera \etal & 74.5 & 89.7 & 69.7 & \textbf{93.8} & 72.9 & \textbf{96.5} & 67.1 & 83.4 & 79.0 \\
-%     Ours & \textbf{91.9} & \textbf{92.8} & \textbf{84.7} & 86.5 & \textbf{94.3} & 92.6 & \textbf{79.7} & \textbf{98.7} & \textbf{89.3} \\
-%     \hline
-%   \end{tabular}
-%     }
-%   \end{center}
-% \caption[Quantitative Comparisons on Temporal Localization Task.]{\textbf{Quantitative Comparisons on Temporal Localization Task}: Precision (P) and recall (R) scores for each condition as well as the F1 score averaged over all the conditions.}
-% \label{jatable}
-% \end{table*}
+\begin{table}[]
+\begin{center}
+\begin{tabular}{c||c|c|c||c|c|c}
+\begin{tabular}[c]{@{}c@{}}Type of\\ Network\end{tabular} &
+\begin{tabular}[c]{@{}c@{}}Number of \\ Parallel \\ Models\end{tabular} & 
+Depth & 
+\begin{tabular}[c]{@{}c@{}}Branching\\ Positions\end{tabular} & 
+\begin{tabular}[c]{@{}c@{}}Test\\ Accuracy\end{tabular} & 
+\begin{tabular}[c]{@{}c@{}}Scenario\\ Accuracy\end{tabular} & 
+\begin{tabular}[c]{@{}c@{}}Number of\\ Params\\ (millions)\end{tabular}  \\
+\hline\hline
+MobileNet& - & - & - & 89.7 & 89.02 & 3.22  \\ 
+\hline
+\hline
+\multirow{3}{*}{\begin{tabular}[c]{@{}c@{}}Multiple\\ Smaller\\ CNNs\end{tabular}} 
+& 2 & - & - & 88.86 & 88.79 & 2.12 \\ 
+\cline{2-7} 
+& 3 & - & - & 88.37 & 88.43 & 2.16 \\ 
+\cline{2-7} 
+& 5 & - & - & 88.06 & 87.89 & \textbf{1.75}\\ 
+\hline
+\hline
+\multirow{10}{*}{\begin{tabular}[c]{@{}c@{}}Hierarchical\\ CNNs\end{tabular}} 
+& - & 1 & 3 & 89.64 & 89.46 & 2.13 \\ 
+\cline{2-7} 
+& - & 1 & 5 & 90.21 & 90.09 & 2.19 \\ 
+\cline{2-7} 
+& - & 1 & 8 & 90.09 & 89.71 & 2.45 \\ 
+\cline{2-7} 
+& - & 2 & 3,6 & 90.15 & 90.04 & 1.99 \\ 
+\cline{2-7} 
+& - & 2 & 5,8 & 90.16 & 89.84 & 2.08 \\ 
+\cline{2-7} 
+& - & 2 & 3,8 & 89.87 & \textbf{90.14} & 2.03 \\ 
+\cline{2-7} 
+& - & 2 & 5,11 & \textbf{90.6} & 90.11 & 2.18 \\ 
+\cline{2-7} 
+& - & 2 & 8,11 & 89.98 & 89.19 & 2.44 \\ 
+\cline{2-7} 
+& - & 3 & 3,6,9 & \textbf{90.27} & \textbf{90.12} & \textbf{1.82} \\ 
+\cline{2-7} 
+& - & 3 & 5,8,11 & 89.89 & 89.88 & 1.98                                                                   
+\end{tabular}
+\end{center}
+\caption[Comparison of Accuracy and Memory Cost on Image Classification task with VGG16]{\textbf{Comparison of Accuracy and Memory Cost on Image Classification task with MobileNet}: Two methods are compared with the backbone network on the test accuracy, scenario accuracy and number of parameters.}
+\label{ic-mobilenetcifar10}
+\end{table}

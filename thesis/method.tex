@@ -66,6 +66,7 @@ Applying hierarchical agglomerative clustering with the pre-calculated distances
 \end{figure}
 
 \subsection{Hierarchy to CNN model}
+\label{ssec:hiertoCNN}
 
 Obtaining the hierarchy as described in \ref{ssec:hierarchy}, we construct our hierarchical CNN model. Depending on the hyper-parameters, such as depth of the tree, branching positions etc., there are many ways to construct the structure of hierarchical CNN with reference to the obtained hierarchy.
 
@@ -140,7 +141,7 @@ These subsets of classes corresponds to the same subsets of classes recognized i
 Same as the hierarchical CNN, we reduce the size of the each network to make the total sum of the number of parameters of all networks equal to the backbone network. 
 We will refer to this method as multiple CNNs. 
 
-In this method, none of the networks share parameters, thus decreasing the size of each network more than that of hierarchical CNNs by also reducing the number of parameters in the earlier layer. 
+In this method, none of the networks share parameters, thus decreasing the size of each network more than that of hierarchical CNNs by also reducing the number of parameters in the earlier layers. 
 However, reducing the number of extracted low-level features from the input image in the early layers would result in a decrease of accuracy. 
 The decrease in the accuracy is dire especially when the number of sub-networks is higher because we reduce the size of the each network more to balance with the backbone network size. 
 We compare both the methods and the backbone network in terms of their accuracy and average memory consumption per user. 
