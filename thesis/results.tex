@@ -79,36 +79,6 @@ Then the calculation is done as the following.
 Finally, we take an average of $S_{total}$ over all the test users to obtain our final result for the storage consumption in our scenario.
 
 
-\subsection{Experiments}
-As mentioned before, experiments are done on CIFAR-10. VGG16 based model results can be seen in the figure \ref{fig:vggcifar} where as results for MobileNet based models is in the figure \ref{fig:mobilecifar}. 
-
-The first three columns are the hyper-parameters. 
-In this specific experiment, hierarchical CNN with depths 1, 2, 3 has 2, 3 and 5 leaf nodes respectively due to the obtained hierarchy, 
-hence they correspond to multiple CNN with number of models 2, 3 and 5. 
-Each corresponding model pairs have the same class labels on their leaf nodes.
-Incidentally, note that depth is limited to 3 in CIFAR-10 experiments due to the number of classes.
-
-Branching positions are generally chosen to be the convolutional layer positions that the number of kernels increase with respect to the previous layer in the backbone network. 
-The reason is intuitive because otherwise the number of kernels would be less than the previous layer's as we reduce the number of kernels when branching. 
-Having said that, it is possible to choose all positions.
-
-In both figure \ref{fig:vggcifar} and \ref{fig:mobilecifar}, best model overall is hierarchical CNN architecture with depth 3. 
-Even though the number of parameters for multiple CNN with 5 models is the least, the accuracy drop is an issue because the number of parameters for first layers are less than that of hierarchical CNN.
-
-Experiments on Places365 dataset is done for MobileNet based models. In figure \ref{fig:mobileplaces}, accuracy drop can be observed more clearly. Hierarchical CNN seems to be a good trade-off between accuracy and memory consumption per user.
-
-
-
-\section{Image Retrieval}
-
-% \begin{description}
-% \item{\textbf{ObMiC}~\cite{fu2014object}.} This method is one of the most relevant method to our work as it used region proposals and considered temporal consistency for co-segmenting objects across multiple videos. We introduce this baseline to see how points-of-gaze information guides the segmentation of objects being looked at jointly since this baseline method is not utilizing the information from point-of-gaze data.
-
-% \item{\textbf{Baseline1}.} In order to see if points-of-gaze information alone works well for segmenting objects of joint attention, this simplified version of the proposed model employs the only $\Psi\sub{GO}$, the first term of Eq.~(\ref{equa_model_potential}), while abnegating temporal consistency between segments and the effect of joint attention.
-
-% \item{\textbf{Baseline2}.} In this baseline, we aim to see how the cue of temporal consistency helps stable segmentation under cluttered scenes and noisy points of gaze. Specifically, we use $\Psi\sub{GO}$ and $\Psi\sub{TS}$, which means that we optimize multiple linear-chain CRF sub-modules independently without considering the cues about joint attention.
-% \end{description}
-
 \begin{table}[]
 \begin{center}
 \begin{tabular}{c||c|c|c||c|c|c}
@@ -158,6 +128,23 @@ VGG16& - & - & - & 89.33 & 88.38 & 15.25  \\
 \end{table}
 
 
+\subsection{Experiments}
+As mentioned before, experiments are done on CIFAR-10. Results for the models using VGG16 as the backbone network can be seen in the Table \ref{ic-vgg16cifar10} where as results for MobileNet based models is in the Table \ref{ic-mobilenetcifar10}. 
+
+The first three columns are the hyper-parameters. 
+In this specific experiment, hierarchical CNN with depths 1, 2, 3 has 2, 3 and 5 leaf nodes or branches respectively due to the obtained hierarchy.
+Also, they correspond to multiple CNNs with number of models 2, 3 and 5. 
+Each corresponding model pairs have the same class labels on their leaf nodes.
+Incidentally, note that depth is limited to 3 in CIFAR-10 experiments due to the number of classes.
+
+Branching positions are generally chosen to be the convolutional layer positions that the number of kernels increase with respect to the previous layer in the backbone network. 
+The reason is intuitive because otherwise the number of kernels would be less than the previous layer's as we reduce the number of kernels when branching. 
+Having said that, it is also possible to choose all positions.
+
+In both Table \ref{ic-vgg16cifar10} and \ref{ic-mobilenetcifar10}, best model overall is hierarchical CNN architecture with depth 3. 
+Even though the number of parameters for multiple CNN with 5 models is the least, the accuracy drop is an issue because the number of parameters for first layers are less than that of hierarchical CNN.
+
+
 \begin{table}[]
 \begin{center}
 \begin{tabular}{c||c|c|c||c|c|c}
@@ -205,3 +192,42 @@ MobileNet& - & - & - & 89.7 & 89.02 & 3.22  \\
 \caption[Comparison of Accuracy and Memory Cost on Image Classification task with VGG16]{\textbf{Comparison of Accuracy and Memory Cost on Image Classification task with MobileNet}: Two methods are compared with the backbone network on the test accuracy, scenario accuracy and number of parameters.}
 \label{ic-mobilenetcifar10}
 \end{table}
+
+
+\section{Image Retrieval}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{thesis/images/ret_first_result_fixed-fig.png}
+    \caption{Comparison of our method with FaissIVFPQ}
+    \label{fig:ret-res-1}
+\end{figure}
+
+
+In our experiments, two types of tests are conducted. 
+The first phase of testing is done with random or hand-picked data to analyze our method thoroughly. 
+For the second phase of testing, real data is used to observe whether our method is applicable to real-life scenarios. 
+Two phases will be explained in their respective sections.
+
+\subsection*{Experiments with Artificial Data}
+
+Our proposed method is making use of the user requirements to speed up the search for image retrieval. 
+In our work, user requirements are represented with the classification labels. 
+These are the labels that the users most likely encounter in their daily lives. 
+According to our scenario, these labels are extracted with a recognition model included in their device as mentioned earlier in \ref{retrievallabelinfo}. 
+In our experiments, we either randomly picked or hand-picked these labels to validate our method with diversified tests.
+
+When the class labels are randomly picked, the results are expected to be the worst for our method. 
+The reason is that randomly picked labels would not be related to each other, whereas in real life user-required labels might have similar images. 
+Because the task is similarity search, similar images with different labels are closer in the search space, therefore it is easier to reduce the space more.
+For example, randomly picked labels might include labels such as volcano, waterfall, ski slope at the same time, whereas user-required labels are more likely to have labels such as campus, library-outdoor, library-indoor.
+Having said that, results for randomly picked labels can be seen in the figure .........
+
+Further experiments are done with hand-picked labels. 
+In these experiments, labels are picked intuitively considering their relevancy. 
+The results can be seen .........
+
+\subsection*{Experiments with Real Data}
+
+The real data for this phase is obtained by Go Pro 8.
+

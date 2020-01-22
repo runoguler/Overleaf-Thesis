@@ -224,6 +224,7 @@ We applied Principal Component Analysis (PCA) to obtain the final descriptor vec
 
 
 \subsection{Dataset and Using classification label information}
+\label{retrievallabelinfo}
 
 In our experiments, we used the scene recognition dataset called Places365\cite{zhou2017places}. 
 Only the training images of Places365 is used to construct our retrieval database. 
@@ -271,5 +272,5 @@ When querying for a user, only the images with the required labels out of 3000 a
 \subsection{Baselines}
 
 Our main baseline is the FAISS implementation\cite{faiss} of product quantization with inverted index, namely IndexIVFPQ.
-We compared our method with IndexIVFPQ by evaluating for search time per query and recall at 1 where recall at $k$ checks if the true result is one of the $k$ predicted results.
+We compared our method with IndexIVFPQ by evaluating both method for search time per query and recall at 1 where recall at $k$ checks if the true result is one of the $k$ predicted results. 
 
