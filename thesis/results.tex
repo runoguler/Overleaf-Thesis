@@ -198,9 +198,21 @@ MobileNet& - & - & - & 89.7 & 89.02 & 3.22  \\
 
 \begin{figure}
     \centering
-    \includegraphics[width=0.8\textwidth]{thesis/images/ret_first_result_fixed-fig.png}
-    \caption{Comparison of our method with FaissIVFPQ}
-    \label{fig:ret-res-1}
+    \begin{minipage}[b]{.5\textwidth}
+        \centering
+        \includegraphics[width=.9\linewidth]{thesis/images/3_random.png}
+        % \caption{Results for 3 random label}
+        \label{fig:randomexpsub1}
+    \end{minipage}%
+    \begin{minipage}[b]{.5\textwidth}
+        \centering
+        \includegraphics[width=.9\linewidth]{thesis/images/10_random_only_mo1.png}
+        % \caption{Results for 10 random label}
+        \label{fig:randomexpsub2}
+    \end{minipage}
+    %\includegraphics[width=0.40\textwidth]{images/hierfig.png}
+    \caption{Comparison of our method with FaissIVFPQ on randomly picked labels as user requirements}
+    \label{fig:randomexp}
 \end{figure}
 
 
@@ -221,13 +233,54 @@ When the class labels are randomly picked, the results are expected to be the wo
 The reason is that randomly picked labels would not be related to each other, whereas in real life user-required labels might have similar images. 
 Because the task is similarity search, similar images with different labels are closer in the search space, therefore it is easier to reduce the space more.
 For example, randomly picked labels might include labels such as volcano, waterfall, ski slope at the same time, whereas user-required labels are more likely to have labels such as campus, library-outdoor, library-indoor.
-Having said that, results for randomly picked labels can be seen in the figure .........
+Having said that, results for randomly picked labels can be seen in the figure \ref{fig:randomexp}.
+In both of the figures, it can be clearly seen that our method surpasses the baseline as our method can perform faster with the same accuracy.
 
 Further experiments are done with hand-picked labels. 
 In these experiments, labels are picked intuitively considering their relevancy. 
-The results can be seen .........
+The results can be seen in the figure \ref{fig:handpickedexp}. 
+We can see again that our method performs better than the baseline.
+
+When the number of labels chosen for user requirements is relatively small, our method outperforms the baseline method.
+However, as the number of labels go up, our method starts to behave similarly to the baseline.
+The reason is that we only search the sub-spaces in our search space which contains at least $k$ of any required labels. 
+When the number of labels is high, it becomes harder to exclude some sub-spaces. Because almost all of them has at least one of any required labels. 
+That is why, our method works if user required labels are relatively small which actually makes sense because if the user requires many labels, they do not need to use our system as they can use generic model for their need.
+
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{thesis/images/9_handpicked.png}
+    \caption{Comparison of our method with FaissIVFPQ on hand-picked labels as user requirements}
+    \label{fig:handpickedexp}
+\end{figure}
 
 \subsection*{Experiments with Real Data}
 
-The real data for this phase is obtained by Go Pro 8.
+The real data for this phase is obtained using GoPro Hero8 with a chest mount. 
+Daily v-logs are taken for 2 days, first day data is used for extracting user required classification labels and second day data is used to actually test our method.
+
+Daily v-logs are recorded for 2 days for nearly a total of 2 hours. 
+Videos are mostly taken when the subject is on the move to prevent recording constant same scenes.
+For each day, videos are sampled with a ratio of 1 frame per 10 seconds. 
+426 frames for the first day and 280 frames for the second day is obtained.
+
+First day frames are classified with a pre-trained ResNet with 18 layers~\cite{resnet}. 
+73 different labels are recognized from 426 frames with many misclassified labels such as airplane cabin, airport terminal, berth, catacomb and many more. 
+Many labels are predicted only once or with little probabilities. Therefore, a limit is put to probability and minimum occurrence to exclude some of the labels. 
+We refer to this method as "Ours-limited".
+
+Second day frames(280) are converted to query vectors with the usual process, explained in \ref{extractdeepfeatures}. The result of searching with these query images is shown in the figure \ref{fig:realdataexp}. 
+There are 1140 sub-spaces in the search space. Our method could reduces the area to only 1108 sub-spaces using 73 user-required labels. 
+Thus, our method fails to speed up the baseline for the real-life experiment. 
+Limited version of our method is obtained by a limit to probability by 50 percent classification accuracy and at least 3 minimum occurrence of labels to count them as requirements.
+However, excluding some classified labels reduced the accuracy of "Ours-limited".
+Further experiments will be shown in \ref{Appen} Additional Results.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{thesis/images/real_data_experiment.png}
+    \caption{Comparison of our method with FaissIVFPQ in a real-life experiment}
+    \label{fig:realdataexp}
+\end{figure}
 

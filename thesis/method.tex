@@ -203,6 +203,7 @@ In this way, we can adjust the trade-off between accuracy and the speed of the s
 
 
 \subsection{Extracting Deep Features of Images}
+\label{extractdeepfeatures}
 
 \begin{figure}
     \centering
@@ -239,7 +240,7 @@ With such diverse scenes, users would interact with only a subset of the class c
     \label{fig:label-dist}
 \end{figure}
 
-The search space is divided into 1350 subspaces which is roughly the square root of the number of all images. 
+The search space is divided into 1140 subspaces which is the square root of the number of images in our search database. 
 Distribution of the images according to their classification labels can be seen in the figure \ref{fig:label-dist}.
 As can be seen in the figure, some subspaces have extreme bias towards a few class, while others do not have much. 
 There are many class categories in Places dataset that have similar images, such as "elevator-door", "elevator-interior", "elevator lobby", "elevator shaft", etc.
@@ -248,7 +249,7 @@ For example, the subspace with id:17 in the figure has labels with very similar 
 According to our scenario, users have wearable devices with a camera, such as wearable glasses or a smart phone. 
 When they first start using the image search system, the class recognition system will store the classification labels of the users. 
 After storing labels for enough time, we will consider those labels as the user's required class labels.
-Then, we select the subspaces, out of all 1350 subspaces, that contain any of those class labels at least $m$ times. 
+Then, we select the subspaces, out of all 1140 subspaces, that contain any of those class labels at least $m$ times. 
 $m$ is the hyper-parameter to adjust the trade-off between accuracy and speed.
 Whenever a new query image comes from the user, we compare the query vector only with the centroids of the selected subspaces to reduce time.
 Note that, classification labels are merely a tool for us to categorize the requirements of the users.
