@@ -18,17 +18,67 @@
 
 \section{Summary}
 
-...
+In this thesis, it is demonstrated that efficient models can be obtained by taking advantage of the requirements of each user. 
+We applied our idea to both image classification and image retrieval tasks.
+In image classification, hierarchical CNN architecture is used to learn the multi-class classification. 
+Then, a personalized model, a few branches of the hierarchical CNN, is distributed to each user according to their requirements.
+Experiments on CIFAR-10 showed that average users could use a smaller, memory efficient model while maintaining the classification accuracy.
+For image retrieval task, our idea is used to reduce the area of the search space to increase the search speed for each user.
+By obtaining user requirements in the form of classification labels, each subspace is inspected whether they contain images with any of the user-required labels. 
+By finding the relevant sub-spaces and performing the search only on them, a personalized area of search is determined for each user. 
+Experimental results revealed that our method works as expected on artificial data whereas it still needs more work to be done for the real-life scenario.
 
 \section{Future Work}
 
-...
+Possible future experiments and the direction of our research will be discussed in the following sections.
 
 \subsection*{Image Classification}
 
-...
+According to our experimental results, each user can obtain a personal, memory-efficient CNN model by using hierarchical CNN.
+Although these results are very promising, CIFAR-10 is a relatively small dataset and maintaining the accuracy of the models is not a hard task.
+Therefore, the hierarchical CNN method should be tested in a larger dataset to see its true potential. 
+However, there are various things to consider before experimenting on a big dataset.
+
+The hierarchy of our model is following a binary tree structure. 
+However, there are so many possibilities to construct the hierarchy. 
+One example would be a flexible structure, where the branching operation splits the model into 2 or more branches, instead of only 2. 
+Even though current experimental results suggest that the accuracy-memory trade-off is better when the depth of the tree is larger, an accuracy drop is expected when the hierarchical model is tested on a bigger dataset.
+Furthermore, there is a need to examine alternative hierarchical clustering methods, such as other top-down and bottom-up approaches, to improve memory reduction according to user-required class labels.
+
+The most important future task would be to test our model with real-life user data as user-required classification labels are generated artificially.
+One approach of obtaining the real user data would be like the following scheme.
+Experiment user group is divided into training and test users. 
+We collect egocentric videos of daily activities from the training users.
+A set of classification labels are obtained by classifying each user's videos.
+These sets of class labels are used to hierarchically cluster the labels to obtain our hierarchy. 
+Afterwards, hierarchical CNN with the obtained hierarchy is trained. 
+Then, test users are given the whole hierarchical CNN and they start to use it according to our scenario. 
+After a fixed time of using the whole model, each user's model is optimized according to the previously classified labels.
+The users in the experiment group should be from diverse backgrounds to cover the whole classification labels. 
+In this way, an accurate hierarchy can be obtained.
+
 
 \subsection*{Image Retrieval}
 
-...
+In our experiments, IndexIVFPQ (Inverted File Index + Product Quantization) implementation of FAISS is used as our baseline. 
+Current state-of-the-art implementation is IndexIVFPQ used with HNSW (Hierarchical Navigable Small World). 
+For our future experiment, we will implement our idea on top of HNSW+IVFPQ to speed up the search according to our idea of reducing the search space according to user requirements.
+
+Experimental results revealed that the results with real-life data are not as good as we expected. 
+Possible reasons are discussed in the previous chapter. 
+This time, we used videos from the daily-life of only one person for 2 days, first day for training and the other day for testing. 
+In the future, longer videos from many users will be used in our experiments.
+In order to eliminate the bad training and test frames, a better sampling strategy should be employed.
+
+Places365, a scene recognition dataset, is used in our experiments. 
+Because of the existence of many correlated class labels, the accuracy of classifying the labels is relatively low, therefore correctly finding the user-required label is difficult. 
+In our future experiments, other datasets can be used to examine our method further. 
+
+We will extend our experiments further to object classification. 
+An example scenario will be as the following.
+A large object classification dataset, such as ImageNet, will be used to build our search database.
+In the training phase of our method, objects seen by the users will be collected to form user-required class labels for each user. 
+Afterwards, test users will capture object images from their daily life to search for the most similar objects. 
+We hope to examine our method's strengths even more with the object classification task.
+
 
