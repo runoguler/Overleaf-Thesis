@@ -71,11 +71,11 @@ The storage consumption per user is calculated as follows.
 Let us assume that a test user encounters 1000 images and personalized model was sufficient to recognize the class of the images $p$ times. 
 The whole model is initially used $k$ times to learn the user requirements. 
 $k$ is set to be 10 for our experiments.
-The size of the whole model, personalized model and average size of the extra used model parts are $S_w$,$S_p$ and $S_{ex}$ respectively.
+The size of the whole model, personalized model and average size of the extra used model parts are $S_w$, $S_p$ and $S_{ex}$ respectively.
 Then the calculation is done as the following.
-\begin{equation*}
-    S_{total} = [k(S_w) + p(S_p) + (1000-k-p)(S_p+S_{ex})] / 1000
-\end{equation*}
+\begin{equation}
+    S_\mathrm{total} = [k(S_\mathrm{w}) + p(S_\mathrm{p}) + (1000-k-p)(S_\mathrm{p}+S_\mathrm{ex})] / 1000
+\end{equation}
 Finally, we take an average of $S_{total}$ over all the test users to obtain our final result for the storage consumption in our scenario.
 
 
@@ -189,7 +189,7 @@ MobileNet& - & - & - & 89.7 & 89.02 & 3.22  \\
 & - & 3 & 5,8,11 & 89.89 & 89.88 & 1.98                                                                   
 \end{tabular}
 \end{center}
-\caption[Comparison of Accuracy and Memory Cost on Image Classification task with VGG16]{\textbf{Comparison of Accuracy and Memory Cost on Image Classification task with MobileNet}: Two methods are compared with the backbone network on the test accuracy, scenario accuracy and number of parameters.}
+\caption[Comparison of Accuracy and Memory Cost on Image Classification task with MobileNet]{\textbf{Comparison of Accuracy and Memory Cost on Image Classification task with MobileNet}: Two methods are compared with the backbone network on the test accuracy, scenario accuracy and number of parameters.}
 \label{ic-mobilenetcifar10}
 \end{table}
 
@@ -215,6 +215,14 @@ MobileNet& - & - & - & 89.7 & 89.02 & 3.22  \\
     \label{fig:randomexp}
 \end{figure}
 
+According to our scenario, users have wearable devices with a camera, such as wearable glasses or a smart phone. 
+When they first start using the image search system, the class recognition system will store the classification labels of the users. 
+After storing labels for enough time, we will consider those labels as the user's required class labels.
+Then, we select the subspaces, out of all 1140 subspaces, that contain any of those class labels at least $m$ times. 
+$m$ is the hyper-parameter to adjust the trade-off between accuracy and speed.
+Whenever a new query image comes from the user, we compare the query vector only with the centroids of the selected subspaces to reduce time.
+Note that, classification labels are merely a tool for us to categorize the requirements of the users.
+Most similar images do not necessarily have the same labels.
 
 In our experiments, two types of tests are conducted. 
 The first phase of testing is done with random or hand-picked data to analyze our method thoroughly. 

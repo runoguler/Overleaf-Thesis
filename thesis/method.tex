@@ -12,23 +12,29 @@
 \chapter{Proposed Method}
 \label{method}
 
-% \begin{equation}
-% \label{equa_model_potential}
-% \small{
-% \begin{aligned}
-% \Psi(S^{(1)}, S^{(2)},J\mid G^{(1)}, G^{(2)}) &= \sum_{p\in\{1, 2\}} \Psi\sub{GO}(S^{(p)} \mid G^{(p)}) \\ &+\sum_{p\in\{1, 2\}} \Psi\sub{TS}(S^{(p)})\\
-% &+\Psi\sub{JA}(J,S^{(1)},S^{(2)}\mid G^{(1)}, G^{(2)}) \\
-% &+ \Psi\sub{TJ}(J),
-% \end{aligned}
-% }
-% \end{equation}
 
 \section{Hierarchical CNN}
 \label{sec:HierCNN}
 
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{thesis/images/hierarchical-cnn-fig.png}
+    \caption{Regular CNN model on the left is converted to a hierarchical CNN. Users can use only some branches depending on their needs.}
+    \label{fig:hiermethodoverview}
+\end{figure}
+
+Given a regular CNN model that can recognize many class categories, our method designs a hierarchical CNN which can be used partially according to each user's requirements. 
+As it can be seen in the figure \ref{fig:hiermethodoverview}, users are able to use only a single branch of the hierarchical model, if they only require the categories of cats and dogs. 
+In this way, our method is trying to achieve smaller, memory efficient CNN models that are adapted to each user's personal usages.
+
+There are two steps in our method: creating a hierarchical representation of class categories and building CNN model according to the hierarchy.
 In the following subsections, we explain the process of building the hierarchy and CNN model. 
 Then, we share the details of how we generate realistic training and test users.
 Lastly, we define the baselines to compare with our method.
+
+\subsection{Method}
+
+
 
 \subsection{Constructing the hierarchy}
 \label{ssec:hierarchy}
@@ -45,25 +51,6 @@ Secondly, we calculate the number of co-occurrences for every pair of class labe
 Hierarchical distances between the class labels can be determined by inverting the ratios of the co-occurrence matrix, 
 as the distance of two class labels is smaller when the number of co-occurences are larger. 
 Applying hierarchical agglomerative clustering with the pre-calculated distances between each class label, we obtain a tree hierarchy as in the Figure \ref{fig:hierarchy}.
-
-\begin{figure}
-    \centering
-    \begin{minipage}[b]{.4\textwidth}
-        \centering
-        \includegraphics[width=.9\linewidth]{images/hierfig.png}
-        %\caption{Hierarchical clustering of each class label in a 10-class example}
-        \label{fig:sub1}
-    \end{minipage}%
-    \begin{minipage}[b]{.4\textwidth}
-        \centering
-        \includegraphics[width=.9\linewidth]{images/example_hier.png}
-        %\caption{Hierarchical CNN obtained from the hierarchy on the left}
-        \label{fig:sub2}
-    \end{minipage}
-    %\includegraphics[width=0.40\textwidth]{images/hierfig.png}
-    \caption{Hierarchical clustering of each class label in a 10-class example and the resulting network structure}
-    \label{fig:hierarchy}
-\end{figure}
 
 \subsection{Hierarchy to CNN model}
 \label{ssec:hiertoCNN}
@@ -96,6 +83,25 @@ In this simple example, the backbone network consists of four subsequent convolu
 Note that, reduced number of convolutional channels are represented as the size of the layers in the figure.
 As an implementation rule, we do not split the branch if the remaining class labels in the branch is 3 or less. 
 That is why the left branch in the figure is not divided into further sub-branches.
+
+\begin{figure}
+    \centering
+    \begin{minipage}[b]{.4\textwidth}
+        \centering
+        \includegraphics[width=.9\linewidth]{images/hierfig.png}
+        %\caption{Hierarchical clustering of each class label in a 10-class example}
+        \label{fig:sub1}
+    \end{minipage}%
+    \begin{minipage}[b]{.4\textwidth}
+        \centering
+        \includegraphics[width=.9\linewidth]{images/example_hier.png}
+        %\caption{Hierarchical CNN obtained from the hierarchy on the left}
+        \label{fig:sub2}
+    \end{minipage}
+    %\includegraphics[width=0.40\textwidth]{images/hierfig.png}
+    \caption{Hierarchical clustering of each class label in a 10-class example and the resulting network structure}
+    \label{fig:hierarchy}
+\end{figure}
 
 \subsection{Generating user types and case study users}
 
@@ -147,10 +153,6 @@ The decrease in the accuracy is dire especially when the number of sub-networks 
 We compare both the methods and the backbone network in terms of their accuracy and average memory consumption per user. 
 All three architecture can be seen in the figure \ref{fig:baselines}.
 
-
-\section{Faster ANN}
-\label{sec:FasterANN}
-
 \begin{figure}
     \centering
     \includegraphics[width=0.9\textwidth]{thesis/images/image_ret_exp-fig.png}
@@ -158,31 +160,30 @@ All three architecture can be seen in the figure \ref{fig:baselines}.
     \label{fig:ret-exp}
 \end{figure}
 
-Image retrieval task consists of two tasks, representing images with vectors and searching a database of vectors for the nearest vector to the input image, as in figure \ref{fig:ret-exp}. 
+
+\section{Faster ANN}
+\label{sec:FasterANN}
+
+In image retrieval task, images are represented as vectors and the aim is to search a database of vectors for the nearest vector to the input image, as in figure \ref{fig:ret-exp}. 
+For each query vector $\mathcal{Q} = \{\bm{q_1},...,\bm{q_M}\} \subset \mathbb{R}^D$ and database vectors $\mathcal{X} = \{\bm{x_1}, ..., \bm{x_N}\} \subset \mathbb{R}^D$, the task is to retrieve the most similar image with $n^* = \underset{n\in\{{1,...,N}\}}{\mathrm{argmin}} \vert\vert \bm{q} - \bm{x_n} \vert\vert $. 
+
 Naive approach would be brute-force searching the entire database.
-However, exhaustive searching of the database is slow and complex, especially with vectors with large dimensions. 
+However, exhaustive searching of the database is slow and costly, especially with vectors with large dimensions. 
 Thus, Approximate Nearest Neighbor (ANN) search algorithms are proposed with significantly faster search speed and a small probability of error. 
-We built our work on the FAISS implementation\cite{faiss} of Product Quantization\cite{jegou2010product} with inverted multi-index as well as using it as our baseline.
+We built our work on the FAISS implementation~\cite{faiss} of Product Quantization~\cite{jegou2010product} with inverted multi-index as well as using it as our baseline.
 
-As explained previously in \ref{subsec:related-quantization}, product quantization method clusters the database space into $k$ clusters using k-means clustering algorithm. 
-Following the convention, we chose $k=\sqrt{N}$ where $N$ is the number of database vectors. 
-In this way, number of vectors corresponding to a centroid of a cluster will be $\sqrt{N}$ in average. 
-Once a query vector comes, the algorithm searches the closest centroid among $\sqrt{N}$ centroids. 
-Then, the query vector is compared with the database vectors that belong to the chosen centroid and a few neighboring ones. 
-In both steps, there are $O(\sqrt{N})$ comparisons to be done. 
+As explained previously in section \ref{subsec:related-quantization}, product quantization method clusters the database space into $K$ clusters using k-means algorithm, $\mathcal{X}_1,...,\mathcal{X}_K$. 
+We will refer to these clusters as subspaces or cells.
+Then, the database vectors, $\bm{x_n}$, are assigned into one of $\mathcal{X}_k$.
+When a query vector $\bm{q}\in\mathbb{R}^D$ is searched, first the nearest $\mathcal{X}_k$ is retrieved. 
+Then, all vectors $\bm{x_n}$ in the $\mathcal{X}_k$ is traversed to find the nearest vector.
 
-Our work aims to reduce the number of comparisons in the first step by limiting the area of the search space for each user according to their requirements. 
-The motivation is that most users have a certain query distribution, different than that of the database, 
-so they query some parts of the search space more and the other parts less likely. More will be explained in \ref{motivation}.
-
-In the following subsections, methods of our work will be explained in detail. 
-Firstly, the motivation of our idea will be discussed.
-Then, method of representing the images with vectors will be described. 
-Next, the details of the dataset we used and the importance of using classification label information for our work will be explained. 
-After specifying the implementation details, baselines of our work will be defined.
-
-\subsection{Motivation}
-\label{motivation}
+Our work aims to reduce the area of the search space by limiting the number of comparisons in the first step with $\mathcal{X}_k$ for each user according to their requirements. 
+ANN search algorithms commonly assume that the distribution of the query vectors is the same with the distribution of the database vectors. 
+However, real users have diverse query distributions, different than that of the database, 
+so they query some parts of the search space more and the other parts less likely. 
+This difference is sourcing from their limited surroundings in daily life or their different hobbies and interests. 
+By utilizing this idea, we can reduce the search space by limiting the comparisons only to the relevant $\mathcal{X}_k$ for each user according to their requirements.
 
 \begin{figure}
     \centering
@@ -191,15 +192,63 @@ After specifying the implementation details, baselines of our work will be defin
     \label{fig:motivation}
 \end{figure}
 
-ANN search algorithms commonly assume that the distribution of the query vectors is the same with the distribution of the database. 
-However, real users query the system with different distributions.
-This difference is sourcing from their limited surroundings in daily life or their different hobbies and interests. 
-By utilizing this idea, we can reduce the search space for each user according to their requirements.
-
-In figure \ref{fig:motivation}, an example of query images are coming from a user is shown with red crosses on the search space. 
+In figure \ref{fig:motivation}, query image examples of a user is shown with red crosses on the search space. 
 For this user, a new query vector just needs to be compared with centroids in blue areas. 
 We can reduce the amount of centroids to compare with a simple hyper-parameter, controlling whether to include a subspace according to minimum occurrence of the past query vectors. 
 In this way, we can adjust the trade-off between accuracy and the speed of the system.
+
+In the following subsections, our work will be explained in detail. 
+Firstly, the details of using classification label information to reduce the area of search space will be explained. 
+Next, the dataset and the distribution of class labels to subspaces will be discussed.
+Then, the method of representing the images with vectors will be described in detail. 
+After specifying the implementation details, baselines of our work will be defined.
+
+\subsection{Using classification label information}
+
+In our method, we used classification labels to represent the user requirements. 
+Given the classification labels $\mathcal{C} = \{c_p\}_{p=1}^P$ where $P$ is the number different of labels, each user requirement is defined as $\mathcal{U}_i \subseteq \mathcal{C}$. 
+Assuming we know the classification labels of our database vectors, they can be represented as $\mathcal{X} = \{(\bm{x_1}, c_{p1}), ..., (\bm{x_N}, c_{pN})\}$.
+Then, the subspaces will also contain the class labels, $(\bm{x}, c_p) \in \mathcal{X}_k$.
+
+Given a user requirement $\mathcal{U}_i$ to our system, we choose the corresponding subset of all subspaces according to the following algorithm.
+If any of $(\bm{x}, c_p) \in \mathcal{X}_k$ contains the class label $c_p \in \mathcal{U}_i$, we consider that subspace as a relevant subspace to our user.
+Let us define the relevant subspaces as $\mathcal{X}_\mathrm{rel} \subset \{\mathcal{X}_1,...,\mathcal{X}_K\}$.
+
+In the search part of our algorithm, the query vector $\bm{q} \in \mathbb{R}^D$ is compared with the representative vectors of $\mathcal{X}_\mathrm{rel}$ instead of all the $\{\mathcal{X}_1,...,\mathcal{X}_K\}$. 
+The remaining part of our algorithm is the same with the original PQ method.
+Once the nearest $\mathcal{X}_k$ is found, the vectors associated with that subspace are traversed to find the nearest vector.
+
+Our method accelerates the coarse quantization part of the PQ algorithm, where finding the closest subspace is the objective. 
+We show the significance of accelerating the first part of PQ as the following.
+Following the convention, we chose $K=\sqrt{N}$ where $N$ is the number of database vectors. 
+In this way, number of vectors corresponding to $\mathcal{X}_k$ will be $\sqrt{N}$ in average. 
+Once a query vector comes, the algorithm searches the closest centroid among $\sqrt{N}$ centroids. 
+Then, the query vector is compared with the database vectors that belong to the chosen $\mathcal{X}_k$ and a few neighboring ones. 
+In both steps, there are $O(\sqrt{N})$ comparisons to be done. 
+Therefore, accelerating the first part is as important as accelerating the second part.
+
+\subsection{Dataset and Distribution of Class Labels to Subspaces}
+\label{retrievallabelinfo}
+
+In our experiments, we used the scene recognition dataset called Places365\cite{zhou2017places}. 
+There are 1.8 million training images with 365 class categories. 
+1.3 million out of all images is used to construct our search database. The remaining images are used to train the ANN algorithm and also for the query vectors.
+The class categories include various scenes such as airport terminal, library, train station, waterfall, etc. 
+With such diverse scenes, users would interact with only a subset of the class categories and our idea can be easily applied to speed up the search according to each user's requirements.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{thesis/images/label_dist-fig.png}
+    \caption{Distribution of the images according to their class labels in the first 20 subspaces}
+    \label{fig:label-dist}
+\end{figure}
+
+Following the convention, we chose the number of subspaces as $K=\sqrt{N}$ where $N$ is the number of database vectors. 
+Therefore, the search space is divided into 1140 subspaces which is the square root of the number of images($\sqrt{N}$) in our search database. 
+Distribution of the images to those subspaces according to their classification labels can be seen in the figure \ref{fig:label-dist}.
+As can be seen in the figure, some subspaces have extreme bias towards a few class, while others do not have much. 
+There are many class categories in Places dataset that have similar images, such as "elevator-door", "elevator-interior", "elevator lobby", "elevator shaft", etc.
+For example, the subspace with id:17 in the figure has labels with very similar images.
 
 
 \subsection{Extracting Deep Features of Images}
@@ -222,38 +271,6 @@ Then, all database images are passed through the model once to get their descrip
 However, dimensions of the vectors were quite big for both storage and calculation. 
 As stated in \cite{jegou2012negative}, applying whitening on the descriptor vectors not only helps with the computational and storage costs, but also improves the accuracy of retrieval tasks.
 We applied Principal Component Analysis (PCA) to obtain the final descriptor vectors with 64 dimensions.
-
-
-\subsection{Dataset and Using classification label information}
-\label{retrievallabelinfo}
-
-In our experiments, we used the scene recognition dataset called Places365\cite{zhou2017places}. 
-Only the training images of Places365 is used to construct our retrieval database. 
-There are 1.8 million training images with 365 class categories. 
-The class categories include various scenes such as airport terminal, library, train station, waterfall, etc. 
-With such diverse scenes, users would interact with only a subset of the class categories and our idea can be easily applied to speed up the search according to each user's requirements.
-
-\begin{figure}
-    \centering
-    \includegraphics[width=\textwidth]{thesis/images/label_dist-fig.png}
-    \caption{Distribution of the images according to their class labels in the first 20 subspaces}
-    \label{fig:label-dist}
-\end{figure}
-
-The search space is divided into 1140 subspaces which is the square root of the number of images in our search database. 
-Distribution of the images according to their classification labels can be seen in the figure \ref{fig:label-dist}.
-As can be seen in the figure, some subspaces have extreme bias towards a few class, while others do not have much. 
-There are many class categories in Places dataset that have similar images, such as "elevator-door", "elevator-interior", "elevator lobby", "elevator shaft", etc.
-For example, the subspace with id:17 in the figure has labels with very similar images.
-
-According to our scenario, users have wearable devices with a camera, such as wearable glasses or a smart phone. 
-When they first start using the image search system, the class recognition system will store the classification labels of the users. 
-After storing labels for enough time, we will consider those labels as the user's required class labels.
-Then, we select the subspaces, out of all 1140 subspaces, that contain any of those class labels at least $m$ times. 
-$m$ is the hyper-parameter to adjust the trade-off between accuracy and speed.
-Whenever a new query image comes from the user, we compare the query vector only with the centroids of the selected subspaces to reduce time.
-Note that, classification labels are merely a tool for us to categorize the requirements of the users.
-Most similar images do not necessarily have the same labels.
 
 
 \subsection{Implementation details}

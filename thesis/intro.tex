@@ -13,42 +13,20 @@
 
 \section{Overview}
 
-% \begin{figure}[ht]
-%     \centering
-%     \includegraphics[width=1.0\linewidth]{images/concept-compressed.pdf}
-%     \caption[Discovering Objects of Joint Attention]{\textbf{Discovering Objects of Joint Attention}. Joint attention between persons (1) and (2) is detected (highlighted in red boundaries) from first-person videos recorded with points of gaze data (green circles in the video frames.)}
-%     \label{fig:concept}
-% \end{figure}
-
-% \begin{figure}[t]
-%     \centering
-%     \includegraphics[width=\linewidth]{images/challenges-compressed.pdf}
-%     \caption[Challenges of discovering Objects of Joint Attention]{\textbf{Challenges of discovering Objects of Joint Attention}.}
-%     \label{fig:challenges}
-% \end{figure}
-
-% \emph{first-person points-of-view videos}
-% \footnote{https://www.tobiipro.com/product-listing/tobii-pro-glasses-2/}
-% ~\cite{charman1997infants}
-% \ref{fig:challenges}
-
-% \begin{itemize}
-%     \item Firstly,
-%     \item Secondly, 
-%     \item Thirdly,
-% \end{itemize}
-
-% \section{Challenges and Contributions\label{sec:The-next-section}}
-
-The influence of wearable technology on our lives is gradually getting stronger and becoming part of our lives. 
+The influence of wearable technology on our lives is gradually getting stronger and they are becoming part of our lives. 
 Image classification and image retrieval systems are widely used on smart phones or other wearable devices.
-As the personal usage of these systems are becoming more and more popular, the need for faster and more efficient architectures is highly crucial.
+As the personal usage of these systems are becoming more and more popular, the need for faster and more efficient architectures is evident. 
 
-These systems are commonly implemented with multi-purpose functionality to satisfy a wide range of users. 
-However, people's surroundings, their employment, their hobbies and interests and various other things affect their usage of these systems 
-and they differ from user to user.
-Some users may want to recognize a certain breed of an animal 
+Image classification and image retrieval systems are commonly implemented with multi-purpose functionality to satisfy a wide range of users. 
+In image classification, deep learning models are trained to recognize hundreds of class categories and the models become large in memory and computationally expensive as a consequence.
+In the same manner, search algorithms for image retrieval systems browse the entire area of the search space with billions of images.
+However, people's surroundings, their occupation, hobbies and interests and various other things affect their usage of these systems.
+Each user's needs to use these systems are different from each other.
+A user may want to recognize a certain breed of an animal 
 whereas another user may require to distinguish between kitchen utensils.
+Moreover, some users may never see a physics laboratory, but some other users might be working in one.
+Because the personal usage of these systems is spreading widely, 
+usage requirements of the users should be used to make these systems more efficient.
 
 We propose a novel solution for both image classification and image retrieval tasks 
 that makes use of user requirements to make the systems more efficient and faster while maintaining the accuracy.
@@ -63,15 +41,19 @@ In the recent years, convolutional neural networks (CNNs) have become widely use
 Individual uses are supported by service providers who make use of the high-performance computers. 
 Service providers train and deploy deep neural network models and 
 users download and use the trained models for their specific purposes.
+Generally, wearable devices have limited resources such as computational power or restricted memory size. 
+Despite this limitation, deep learning models commonly require high computational power and memory usage.
 
+In many cases, there is a conflict of interest between service providers and the users.
 On the one hand, service providers often train a very deep model with high-performance computers to achieve accurate and multi-purpose recognition. 
 On the other hand, end-users may have to run the models with a more limited computational resources, e.g., smartphones and wearable devices. 
 Moreover, the users do not always require the whole multi-purpose recognition capabilities. 
-For instance, they may only need to distinguish a couple of objects they interact with everyday, out of the 1000 diverse classes that can be recognized by training from ImageNet\cite{deng2009imagenet}.
+For instance, they may only need to distinguish a couple of objects they interact with everyday, out of the 1000 diverse classes that can be recognized by training from ImageNet~\cite{deng2009imagenet}.
 
 One straightforward idea to mitigate this gap between service providers and users is 
 to compress the model based on each individual user's requirements and 
-distribute the personally compressed models to the corresponding users. However, it is infeasible to compress the models for every combination of classes and satisfy every single user. 
+distribute the personally compressed models to the corresponding users. 
+However, it is infeasible to compress the models for every combination of classes and satisfy every single user. 
 
 A solution to above mentioned method would be to ask the users to compress models based on their needs to make it executable with their computational resources and memories and also simple enough for their purposes. 
 However, much relevant work requires re-training of the models at user side, 
@@ -115,14 +97,14 @@ We considered two baseline methods, the first one is the backbone CNN that recog
 whereas the second one is \textit{N} smaller models each recognizing a subset of classes.
 The latter method differs from our method in the sense that the models do not share any parameters. 
 Lastly, we worked with CIFAR-10 dataset to compare our method with the baseline methods.
-
+Experimental results showed that memory usage per user can be nearly halved with similar accuracy.
 
 \section{Image Retrieval}
 
-With the advent of internet, everybody had access to enormous amount of digital image data. 
-Searching through this big data has become very important. 
+With the advent of internet, everybody has access to enormous amount of digital image data. 
+Searching through this big data has become a very important task. 
 Image retrieval is widely used in many applications 
-in which there is a image search functionality. 
+in which there is an image search functionality. 
 In this work, we mainly focus on content-based image retrieval (CBIR)
 where the content of the image itself is used to search
 as opposed to using meta-data or descriptive data of an image.
@@ -135,19 +117,19 @@ When a query vector comes, firstly a few sub-spaces are selected with a high lik
 then only the vectors in those sub-spaces are searched.
 Therefore, the search speed is faster with a high probability of finding the true result.
 
+Our idea is to reduce the search space according to the user requirements to speed up the search. 
 Query vectors are usually assumed to have the same distribution with the searched database. 
 However, query images of each user are restricted to user's interests, occupations and mostly their surroundings.
 For example in a similar scene image search, a pilot and a police officer would have completely different query images.
-Given the different query distribution of each user, it is possible to personalize their search to make it faster.
-
-Our idea is to reduce the search space according to the user requirements to speed up the search. 
 Provided that most of the query images are coming from only a part of the search space, the ANN search can be done in that limited space. 
-In our experiments, we show that the search becomes faster with a small or no decrease in accuracy.
+By exploiting the query distribution of each user, it is possible to personalize their search to make it faster.
 
 In our method, we use the classification labels of the images to learn the user requirements. 
-We use places365~\cite{zhou2017places} dataset images to construct the search database and the class label information to realize user requirements.
-Supposing that the most query images of the users are classified into a number of labels, we can reduce the search space by eliminating sub-spaces not containing those labels.
-Then ANN search can be performed in the remaining sub-spaces.
+We use places365~\cite{zhou2017places} dataset images to construct the search database and the classification label information to realize user requirements.
+Supposing that the most query images of the users are classified into a few number of class labels, we can reduce the search space by eliminating sub-spaces not containing those labels.
+After limiting the area of the search, ANN search can be performed in the remaining sub-spaces.
+Results of our experiments with artificial data revealed that the search becomes faster with a small or no decrease in accuracy. 
+However, experimental results with real-life data suggested that more improvement is needed to speed up the image search for a real-life example.
 
 
 \section{Thesis Outline}

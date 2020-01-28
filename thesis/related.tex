@@ -25,7 +25,7 @@ More emphasis will be done to dynamic compression methods.
 Moreover, our proposed method is using a hierarchical approach to solve the problem. 
 Because of this, we will also address some hierarchical systems that are similar to our proposed model.
 
-\subsection*{Efficient CNNs}
+\subsection{Efficient CNNs}
 
 Deep neural network compression techniques reduce the size of the neural networks for a considerable amount. 
 There has been much research about how to efficiently compress neural networks, examples of such methods include pruning~\cite{anwar2017structured}, quantization~\cite{han2016eie}, knowledge distillation~\cite{hinton2015distilling} etc. 
@@ -54,14 +54,13 @@ but also they reduce the size of the model in general, not with respect to each 
 Moreover, our method is to allow users to adaptively use part of the functionality of a model instead of a compression technique.
 Having said that, our method can be used jointly with the mentioned works for further reducing the size of the models according to user requirements.
 
-\subsection*{Dynamic Approaches}
+\subsection{Dynamic Approaches}
 
 More dynamic approaches include pruning convolutional channels at runtime depending on the input image supported by a RNN network to decide which channels to be omitted~\cite{Lin2017RuntimeNP}. 
 As in the figure \ref{fig:runtimenp}, some feature maps are being omitted according to the input image and previously omitted feature maps supervised by RNN.
 This method preserves the full ability of the network and improves the speed of the network while maintaining the accuracy. 
-The network runs adaptively according to the input images and
-can be even fine-tuned for user-requirements to satisfy each user separately.
-However, the model is not getting smaller in storage size. 
+The network runs adaptively according to each input images by only activating relevant feature maps while forwarding an image.
+However, the model is not getting smaller in storage size as the whole model remains in the device. 
 As one of our concern is the restricted storage memory of wearable devices, it does not serve our purpose of providing users with smaller models custom-made for their requirements. 
 
 Another method, namely AdaDeep~\cite{Liu2018OnDemandDM}, automatically selects a combination of compression techniques especially for deploying neural networks on resource-constrained mobile platforms. 
@@ -90,7 +89,7 @@ Also, there is still compensation algorithm required to be run on user-side, whe
     \label{fig:runtimenp}
 \end{figure}
 
-\subsection*{Hierarchical Solutions}
+\subsection{Hierarchical Solutions}
 
 There is plenty of work adopting hierarchically structured CNNs. 
 While some of them employ the hierarchy to achieve higher accuracy, the others aim to obtain efficient models.
@@ -107,7 +106,7 @@ Then, multiple smaller parallel-working networks are obtained.
 Their results are combined to have the overall result for the classification of all labels.
 With this method, individual models can be used for classifying a subset of classes.
 However, the class labels in sub-models are fixed as the decomposition of the large model is based on the similarity of the labels instead of the actual user requirements.
-HSD-CNN\cite{sairam2018hsd} successfully converts many-class CNN to hierarchical by branching the network to two after some initial layers.
+HSD-CNN\cite{sairam2018hsd} successfully converts many-class CNN to a hierarchical model by branching the network to two after some initial layers.
 While branching, the class set is divided to two subsets according to their similarity.
 The layers are split according to their impact on the score for both subsets.
 The resulting network needs fine-tuning step for a few epochs at the end. 
