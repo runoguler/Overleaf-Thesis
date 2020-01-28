@@ -24,17 +24,30 @@
 \end{figure}
 
 Given a regular CNN model that can recognize many class categories, our method designs a hierarchical CNN which can be used partially according to each user's requirements. 
-As it can be seen in the figure \ref{fig:hiermethodoverview}, users are able to use only a single branch of the hierarchical model, if they only require the categories of cats and dogs. 
+As it can be seen in the figure \ref{fig:hiermethodoverview}, users are able to use only a single branch of the hierarchical model if they only require a few categories, such as cats and dogs in this case. 
 In this way, our method is trying to achieve smaller, memory efficient CNN models that are adapted to each user's personal usages.
 
 There are two steps in our method: creating a hierarchical representation of class categories and building CNN model according to the hierarchy.
-In the following subsections, we explain the process of building the hierarchy and CNN model. 
-Then, we share the details of how we generate realistic training and test users.
+In the following subsections, firstly our method will be explained in detail.
+Secondly, we explain the process of building the hierarchy and CNN model. 
+Then, the details of generating realistic training and test users are shared.
 Lastly, we define the baselines to compare with our method.
 
 \subsection{Method}
 
+In a traditional classification task, a classification model $M$ takes an image $\mathbf{I}$ and generates an output $y\in\mathcal{C}$ with $\mathcal{C} = \{c_m\}_{j=1}^M$ where $M$ is number of different classes in a dataset.
 
+User requirements are represented for the $i$th user as $\mathcal{U}_i \subseteq \mathcal{C}$. 
+Given a user requirement $\mathcal{U}_i$, our aim is to obtain $M_i$ where $M_i(\mathbf{I}) = y_{sub}$ and $y_{sub}\in\mathcal{U}_i$. 
+More importantly, we expect $M_i$ to be smaller than $M$ in size, therefore more memory efficient. However, traditional CNN models are not separable to smaller models.
+
+Our method builds a hierarchical CNN so that each user can use only a few required branches according to their required labels. 
+For simplicity, let us assume our hierarchical model $M_H$ has only two branches.
+$M_H = M_\mathrm{root} \cup M_\mathrm{left} \cup M_\mathrm{right}$ where $M_\mathrm{root}$ is the shared first layers, $M_\mathrm{left}$ is the left branch and $M_\mathrm{right}$ is the right branch. 
+Let us refer to the last output of the left branch as $y_l = M_\mathrm{left}(M_\mathrm{root}(\mathbf{I}))$ and the output of the right branch as $y_r = M_\mathrm{right}(M_\mathrm{root}(\mathbf{I}))$.
+$y_l\in\mathcal{C}_l$ and $y_r\in\mathcal{C}_r$ where $\mathcal{C} = \mathcal{C}_l \cup \mathcal{C}_r$ and $\mathcal{C}_l \cap \mathcal{C}_r = \emptyset$. 
+Given a user requirement $\mathcal{U}_i$, if $\mathcal{U}_i \subseteq \mathcal{C}_l$, user only loads $M_\mathrm{root}$ and $M_\mathrm{left}$, and vice versa for the other branch.
+This idea can be generalized easily for many-branch case.
 
 \subsection{Constructing the hierarchy}
 \label{ssec:hierarchy}
@@ -46,11 +59,24 @@ By using this correlation, our objective is to place highly correlated classes c
 so that users are most likely to find all the classes they need in nearby branches. 
 As a result, users would use less branches and therefore less memory.
 
-Given training user data that is described in subsection \ref{ssec:genusers}, we count the occurrences of class labels for each user. 
-Secondly, we calculate the number of co-occurrences for every pair of class labels in the user data, obtaining a co-occurrence matrix.
-Hierarchical distances between the class labels can be determined by inverting the ratios of the co-occurrence matrix, 
-as the distance of two class labels is smaller when the number of co-occurences are larger. 
-Applying hierarchical agglomerative clustering with the pre-calculated distances between each class label, we obtain a tree hierarchy as in the Figure \ref{fig:hierarchy}.
+Hierarchy is determined according to the correlation between pairs of classes. 
+Correlation between classes can be observed from the usage of a classification model for many users.
+Given user data with encountered images and their class labels as $\mathcal{D}_i = \{(\mathbf{I}_t, c_{m_t})\}_{t=1}^T$ where $T$ is the number of data from the $i$th user, we can count the occurrences of each class label $c_m$.
+Let us also define co-occurrence matrix $\mathbf{P}_i = (p_{jk})\in\mathbb{R}^{MxM}$ where
+\begin{equation}
+p_{jk} =
+\begin{cases}
+1~~\mathrm{if}~~(\mathbf{I}_{t_1}, c_j)\in\mathcal{D}_i and (\mathbf{I}_{t_2}, c_k)\in\mathcal{D}_i\\
+0~~\mathrm{otherwise}
+\end{cases}
+\end{equation}
+By adding the co-occurrence matrices for each user, we obtain overall number of co-occurrences for each pair of class labels, $\mathbf{P} = \sum_i \mathbf{P}_i$.
+$\mathbf{P}$ matrix can be interpreted as similarity between the class labels. 
+The higher the number, the more times the corresponding pair is observed together by the same user.
+Therefore, $1/p_{jk}$ can be used to define the distances between each pair of class labels.
+By using the distances, we can divide the labels into 2 using a clustering algorithm such as k-means.
+The whole hierarchy can be obtained by applying clustering algorithm recursively.
+10-class example can be seen in the figure \ref{fig:hierarchy}.
 
 \subsection{Hierarchy to CNN model}
 \label{ssec:hiertoCNN}
@@ -123,7 +149,7 @@ We chose the number of high values(200s) in a user type as 2 or 3 for testing CI
 
 To generate a user, a user type is chosen uniformly randomly between $m$ user types. 
 Then, list of encountered class labels for the user are generated according to the chosen user type. 
-An example of list of encountered class labels would be, $(3,3,5,3,5,5,...,2,...,3,5,3)$ if generated from the distribution $Dir(1,1,200,1,200)$. 
+An example of list of encountered class labels would be, $(3,3,5,3,5,5,\dots,2,\dots,3,5,3)$ if generated from the distribution $Dir(1,1,200,1,200)$. 
 It can be interpreted as the user usually encounters 3rd and 5th classes and sometimes encounters other classes as well.
 Finally, random images from the dataset are collected corresponding to the class categories in the list to make a scenario-based test set for the user.
 
@@ -165,14 +191,14 @@ All three architecture can be seen in the figure \ref{fig:baselines}.
 \label{sec:FasterANN}
 
 In image retrieval task, images are represented as vectors and the aim is to search a database of vectors for the nearest vector to the input image, as in figure \ref{fig:ret-exp}. 
-For each query vector $\mathcal{Q} = \{\bm{q_1},...,\bm{q_M}\} \subset \mathbb{R}^D$ and database vectors $\mathcal{X} = \{\bm{x_1}, ..., \bm{x_N}\} \subset \mathbb{R}^D$, the task is to retrieve the most similar image with $n^* = \underset{n\in\{{1,...,N}\}}{\mathrm{argmin}} \vert\vert \bm{q} - \bm{x_n} \vert\vert $. 
+For each query vector $\mathcal{Q} = \{\bm{q_1},\dots,\bm{q_M}\} \subset \mathbb{R}^D$ and database vectors $\mathcal{X} = \{\bm{x_1}, \dots, \bm{x_N}\} \subset \mathbb{R}^D$, the task is to retrieve the most similar image with $n^* = \underset{n\in\{{1,\dots,N}\}}{\mathrm{argmin}} \vert\vert \bm{q} - \bm{x_n} \vert\vert $. 
 
 Naive approach would be brute-force searching the entire database.
 However, exhaustive searching of the database is slow and costly, especially with vectors with large dimensions. 
 Thus, Approximate Nearest Neighbor (ANN) search algorithms are proposed with significantly faster search speed and a small probability of error. 
 We built our work on the FAISS implementation~\cite{faiss} of Product Quantization~\cite{jegou2010product} with inverted multi-index as well as using it as our baseline.
 
-As explained previously in section \ref{subsec:related-quantization}, product quantization method clusters the database space into $K$ clusters using k-means algorithm, $\mathcal{X}_1,...,\mathcal{X}_K$. 
+As explained previously in section \ref{subsec:related-quantization}, product quantization method clusters the database space into $K$ clusters using k-means algorithm, $\mathcal{X}_1,\dots,\mathcal{X}_K$. 
 We will refer to these clusters as subspaces or cells.
 Then, the database vectors, $\bm{x_n}$, are assigned into one of $\mathcal{X}_k$.
 When a query vector $\bm{q}\in\mathbb{R}^D$ is searched, first the nearest $\mathcal{X}_k$ is retrieved. 
@@ -207,14 +233,14 @@ After specifying the implementation details, baselines of our work will be defin
 
 In our method, we used classification labels to represent the user requirements. 
 Given the classification labels $\mathcal{C} = \{c_p\}_{p=1}^P$ where $P$ is the number different of labels, each user requirement is defined as $\mathcal{U}_i \subseteq \mathcal{C}$. 
-Assuming we know the classification labels of our database vectors, they can be represented as $\mathcal{X} = \{(\bm{x_1}, c_{p1}), ..., (\bm{x_N}, c_{pN})\}$.
+Assuming we know the classification labels of our database vectors, they can be represented as $\mathcal{X} = \{(\bm{x_1}, c_{p1}), \dots, (\bm{x_N}, c_{pN})\}$.
 Then, the subspaces will also contain the class labels, $(\bm{x}, c_p) \in \mathcal{X}_k$.
 
 Given a user requirement $\mathcal{U}_i$ to our system, we choose the corresponding subset of all subspaces according to the following algorithm.
 If any of $(\bm{x}, c_p) \in \mathcal{X}_k$ contains the class label $c_p \in \mathcal{U}_i$, we consider that subspace as a relevant subspace to our user.
-Let us define the relevant subspaces as $\mathcal{X}_\mathrm{rel} \subset \{\mathcal{X}_1,...,\mathcal{X}_K\}$.
+Let us define the relevant subspaces as $\mathcal{X}_\mathrm{rel} \subset \{\mathcal{X}_1,\dots,\mathcal{X}_K\}$.
 
-In the search part of our algorithm, the query vector $\bm{q} \in \mathbb{R}^D$ is compared with the representative vectors of $\mathcal{X}_\mathrm{rel}$ instead of all the $\{\mathcal{X}_1,...,\mathcal{X}_K\}$. 
+In the search part of our algorithm, the query vector $\bm{q} \in \mathbb{R}^D$ is compared with the representative vectors of $\mathcal{X}_\mathrm{rel}$ instead of all the $\{\mathcal{X}_1,\dots,\mathcal{X}_K\}$. 
 The remaining part of our algorithm is the same with the original PQ method.
 Once the nearest $\mathcal{X}_k$ is found, the vectors associated with that subspace are traversed to find the nearest vector.
 
