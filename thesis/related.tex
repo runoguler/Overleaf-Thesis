@@ -12,8 +12,6 @@
 \chapter{Related Work}
 \label{related}
 
-% Rother \emph{et al.}
-
 Since our idea of using diverse user requirements to personalize the systems for efficiency is applied to both image classification and image retrieval tasks, related work of both tasks will be provided in their respective sections.
 
 \section{Image Classification}
@@ -34,12 +32,12 @@ Generally, compression methods prioritize either memory, computation or energy c
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth]{thesis/images/deep_comp-fig.png}
-    \caption{Three steps of Deep Compression by Han et al.\cite{han2015deep}}
+    \caption{Three steps of Deep Compression by Han et al.~\cite{han2015deep}}
     \label{fig:deepcomp}
 \end{figure}
 
-Pruning CNN models involves eliminating some individual connections~\cite{molchanov2016pruning} \cite{Yu_2018_CVPR}\cite{Wang2018StructuredPP} or discarding entire channels \cite{He_2017_ICCV}\cite{li2016pruning} that are identified as having a small importance on the output result.
-In a famous work about pruning\cite{han2015deep}, Han \emph{et al.} succeeded to reduce the size of VGG-16 by 49x with a 3-step method, as in figure \ref{fig:deepcomp}. 
+Pruning CNN models involves eliminating some individual connections~\cite{molchanov2016pruning} \cite{Yu_2018_CVPR} \cite{Wang2018StructuredPP} or discarding entire channels~\cite{He_2017_ICCV}~\cite{li2016pruning} that are identified as having a small importance on the output result.
+In a famous work about pruning~\cite{han2015deep}, Han \emph{et al.} succeeded to reduce the size of VGG-16 by 49x with a 3-step method, as in figure \ref{fig:deepcomp}. 
 First step is to prune or eliminate the model connections whose weights are below a threshold. 
 In this step, the remaining connections are need to be re-trained for a couple of epochs to maintain the accuracy.
 The next step is quantization by grouping the remaining weights into shared weights to reduce the bits to represent the all of the weights.
@@ -70,13 +68,13 @@ Despite serving each user personalized compression, this method is not for adapt
 The resulting model has all the classification functionality that the user does not need for their usage purposes. 
 Even though this method satisfies each user's system requirements, it is not removing the undesired functionality of the system to reduce the network size.
 
-A method for on-device customization of CNNs\cite{guo2017pruning2} aims to prune the unneeded classes with their corresponding filters according to user needs. 
+A method for on-device customization of CNNs~\cite{guo2017pruning2} aims to prune the unneeded classes with their corresponding filters according to user needs. 
 For each class labels, they calculate the impact of each filters on the class labels. 
 Not only do they compute impact of each filter on each class, they also compute the compensation needed by the linear combination of other filters.
 In their scenario, the system distributes the model to each user with an automatic pruning algorithm tailored to each user's need. 
 Then, the users can prune the filters in the model for a specific subset of classes and apply the compensation algorithm to maintain the accuracy after pruning. 
 As all of the calculation is done beforehand, the user just needs to run the program without the need for re-training or fine-tuning.
-A later work of the same group\cite{guo2017pruning} changes the compensation method.
+A later work of the same group~\cite{guo2017pruning} changes the compensation method.
 The new compensation parameters are either the mean feature map or the feature map of the most correlated filter.
 The experiments are only done in CIFAR-10 dataset. The classification accuracy is compared between 10-class model a few-class models, so it is hard to analyze the accuracy drop.
 Moreover, according to their scenario, the whole model is loaded to user's device which might be a memory issue.
@@ -85,7 +83,7 @@ Also, there is still compensation algorithm required to be run on user-side, whe
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth]{thesis/images/runtimenp-fig.png}
-    \caption{Overall framework of Runtime Neural Pruning\cite{Lin2017RuntimeNP}}
+    \caption{Overall framework of Runtime Neural Pruning~\cite{Lin2017RuntimeNP}}
     \label{fig:runtimenp}
 \end{figure}
 
@@ -93,7 +91,7 @@ Also, there is still compensation algorithm required to be run on user-side, whe
 
 There is plenty of work adopting hierarchically structured CNNs. 
 While some of them employ the hierarchy to achieve higher accuracy, the others aim to obtain efficient models.
-Roy et al.~\cite{roy2018tree} uses a Tree-CNN to propose a solution for incremental learning. 
+Roy \emph{et al.}~\cite{roy2018tree} uses a Tree-CNN to propose a solution for incremental learning. 
 In their architecture, the branches of the network grows as new classes added to the model without having an effect on the already learned classes. 
 This hierarchical model is quite similar to our proposed model in this paper, regardless of the problem that it solves. 
 HD-CNN~\cite{Yan_2015_ICCV} approaches image classification with the idea that some classes are easy to classify and they only need coarse networks while others require deeper and more complicated networks. 
@@ -106,7 +104,7 @@ Then, multiple smaller parallel-working networks are obtained.
 Their results are combined to have the overall result for the classification of all labels.
 With this method, individual models can be used for classifying a subset of classes.
 However, the class labels in sub-models are fixed as the decomposition of the large model is based on the similarity of the labels instead of the actual user requirements.
-HSD-CNN\cite{sairam2018hsd} successfully converts many-class CNN to a hierarchical model by branching the network to two after some initial layers.
+HSD-CNN~\cite{sairam2018hsd} successfully converts many-class CNN to a hierarchical model by branching the network to two after some initial layers.
 While branching, the class set is divided to two subsets according to their similarity.
 The layers are split according to their impact on the score for both subsets.
 The resulting network needs fine-tuning step for a few epochs at the end. 
@@ -124,13 +122,13 @@ Then, recent fast and efficient ANN algorithms will be discussed thoroughly.
 
 \subsection{Obtaining Descriptors}
 
-Before the arrival of neural networks, SIFT features were mainly used to obtain descriptor vector for the images~\cite{philbin2007object}\cite{jegou2010aggregating}. 
+Before the arrival of neural networks, SIFT features were mainly used to obtain descriptor vector for the images~\cite{philbin2007object}~\cite{jegou2010aggregating}. 
 However, CNN-based descriptors quickly substituted the traditional methods. 
 Zheng \emph{et al.} compared the performance of many SIFT-based and CNN-based methods on various datasets and superiority of CNN-based methods can clearly be seen. 
 Conventional CNN-based methods use a pre-trained model and they take the output of one of the last fully connected layers as the descriptor vector. 
 In \cite{babenko2014neural}, they compare the descriptor vectors obtained by the output of different last layers of CNN to see which layer is the best for descriptors.
 It is also shown that training the CNN for classification task on a different dataset such as ImageNet gives fairly good results, while fine-tuning the model on the retrieval dataset gives better results.
-Later works use only convolutional layers with a following global pooling operation~\cite{razavian2016visual}\cite{tolias2015particular}. 
+Later works use only convolutional layers with a following global pooling operation~\cite{razavian2016visual}~\cite{tolias2015particular}. 
 In a recent state-of-the-art paper for deep global image descriptor~\cite{radenovic2018fine}, descriptor vectors are obtained with convolutional layers followed by a generalized mean pooling operation.
 
 When obtaining descriptor vectors, one should consider the curse of dimensionality. 
@@ -148,7 +146,7 @@ In the methods using hash tables and inverted lists, such as Locality Sensitive 
 Then, only the vectors that are mapped to the same code as the query vector are searched, therefore only a few inverted lists are checked.
 On the other hand, other methods compare hash-codes of query and database vectors directly to find the nearest vector.
 However, these methods were highly sensitive to data distribution as hash functions should be carefully chosen according to the data. 
-As a result, learning-based hashing methods are appeared~\cite{weiss2009spectral}\cite{liu2012supervised}.
+As a result, learning-based hashing methods are appeared~\cite{weiss2009spectral}~\cite{liu2012supervised}.
 There are many different hashing methods based on LSH, varying by the distance or similarity calculation.
 
 \subsubsection*{Quantization-based methods}
@@ -176,8 +174,8 @@ The search is performed between the query vector and quantized vectors, called A
 After finding the closest centroid to the query vector, its distance to the centroid is compared with the distances of the database vectors belonging to that centroid. 
 The smallest difference between the distances gives the closest vector.
 
-There are several works that improved product quantization. Optimized Product Quantization (OPQ)\cite{ge2013optimized} changes the problem into an minimization problem of quantization error(lost information with quantization) and optimize codebooks to improve accuracy of PQ with more computational cost. 
-On the other hand, Composite Quantization (CQ)\cite{wang2018composite} uses composition of $m$ elements to represent a vector instead of splitting the vector to $m$ equal parts. 
+There are several works that improved product quantization. Optimized Product Quantization (OPQ)~\cite{ge2013optimized} changes the problem into an minimization problem of quantization error(lost information with quantization) and optimize codebooks to improve accuracy of PQ with more computational cost. 
+On the other hand, Composite Quantization (CQ)~\cite{wang2018composite} uses composition of $m$ elements to represent a vector instead of splitting the vector to $m$ equal parts. 
 Sub-codewords are added instead to reconstruct the vector. 
 Reconstruction error and accuracy is better than that of PQ with additional computational cost.
 

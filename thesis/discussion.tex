@@ -38,7 +38,7 @@ However, the results of the experiments with the real-life data was not as good 
 There are several reasons to explain the bad performance with the real-life data. 
 Sampling images from the videos is done automatically by extracting an image in every 10 seconds. 
 These sampled images are both used in training phase to obtain user requirements as classification labels and in testing phase as query vectors.
-However, quality of some images are bad. They are either too dark or blurred to understand. Some bad image examples can be seen in the figure \ref{fig:realdataexp}.
+However, quality of some images are bad. They are either too dark or blurred to understand. Some bad image examples can be seen in the figure \ref{fig:baddata}.
 
 Our method depends heavily on the classification of training images to learn user requirements. 
 Not only the classification accuracy is important, but also the number of classified labels has a direct effect on the search space reduction and consequently on the speed up rate.
@@ -61,7 +61,7 @@ Even in the worst settings, the performance of our method is similar to the base
     \centering
     \includegraphics[width=0.8\textwidth]{thesis/images/ret-bad-images.jpg}
     \caption{Bad image examples in the test data.}
-    \label{fig:realdataexp}
+    \label{fig:baddata}
 \end{figure}
 
 \begin{figure}[ht] 
