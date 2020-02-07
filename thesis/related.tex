@@ -39,7 +39,7 @@ Generally, compression methods prioritize either memory, computation or energy c
 Pruning CNN models involves eliminating some individual connections~\cite{molchanov2016pruning} \cite{Yu_2018_CVPR} \cite{Wang2018StructuredPP} or discarding entire channels~\cite{He_2017_ICCV}~\cite{li2016pruning} that are identified as having a small importance on the output result.
 In a famous work about pruning~\cite{han2015deep}, Han \emph{et al.} succeeded to reduce the size of VGG-16 by 49x with a 3-step method, as in figure \ref{fig:deepcomp}. 
 First step is to prune or eliminate the model connections whose weights are below a threshold. 
-In this step, the remaining connections are need to be re-trained for a couple of epochs to maintain the accuracy.
+In this step, the remaining connections are needed to be re-trained for a couple of epochs to maintain the accuracy.
 The next step is quantization by grouping the remaining weights into shared weights to reduce the bits to represent the all of the weights.
 Last step is using Huffman coding to further reduce the bit representation of all the weights. 
 Another way of reducing the model size is knowledge distillation. 
@@ -61,6 +61,13 @@ The network runs adaptively according to each input images by only activating re
 However, the model is not getting smaller in storage size as the whole model remains in the device. 
 As one of our concern is the restricted storage memory of wearable devices, it does not serve our purpose of providing users with smaller models custom-made for their requirements. 
 
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{thesis/images/runtimenp-fig.png}
+    \caption{Overall framework of Runtime Neural Pruning~\cite{Lin2017RuntimeNP}}
+    \label{fig:runtimenp}
+\end{figure}
+
 Another method, namely AdaDeep~\cite{Liu2018OnDemandDM}, automatically selects a combination of compression techniques especially for deploying neural networks on resource-constrained mobile platforms. 
 AdaDeep aims to compress CNN models according to user specifications such as memory limitation, desired accuracy, etc. 
 It chooses the best combination of compression algorithms among many different algorithms that prioritize different aspects according to user-specified performance goals and resource constraints. 
@@ -79,13 +86,6 @@ The new compensation parameters are either the mean feature map or the feature m
 The experiments are only done in CIFAR-10 dataset. The classification accuracy is compared between 10-class model a few-class models, so it is hard to analyze the accuracy drop.
 Moreover, according to their scenario, the whole model is loaded to user's device which might be a memory issue.
 Also, there is still compensation algorithm required to be run on user-side, whereas in our method users do not need to change the model once the model is loaded.
-
-\begin{figure}
-    \centering
-    \includegraphics[width=\textwidth]{thesis/images/runtimenp-fig.png}
-    \caption{Overall framework of Runtime Neural Pruning~\cite{Lin2017RuntimeNP}}
-    \label{fig:runtimenp}
-\end{figure}
 
 \subsection{Hierarchical Solutions}
 
@@ -182,8 +182,6 @@ Reconstruction error and accuracy is better than that of PQ with additional comp
 In our work, we used PQ with inverted list as a baseline for approximate nearest neighbor search. 
 We specifically improved the first part of the search where the query vector is compared with the centroids by reducing the number of centroids to check with respect to the user requirements. 
 
-\subsubsection*{Graph-based methods}
-
 \begin{figure}
     \centering
     \begin{subfigure}[b]{0.4\textwidth}
@@ -200,6 +198,8 @@ We specifically improved the first part of the search where the query vector is 
     \caption{Hierarchical Navigable Small World~\cite{malkov2018efficient}}
     \label{fig:hnsw}
 \end{figure}
+
+\subsubsection*{Graph-based methods}
 
 In graph-based methods, search space is represented with a graph, where the nodes are the database vectors. 
 Graph is traversed in a greedy manner to find the closest node to the query vector.
